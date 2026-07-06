@@ -39,9 +39,13 @@ user taps to send). No WhatsApp API integration.
 - **matches**: tournament (ref), winner (person), loser (person), played_at
 - **expenses**: payer (person), amount, label, date, participants (person list),
   photo_url (nullable)
-- **settlements**: from (person), to (person), amount, settled (bool)
+- **payments**: from (person), to (person), amount — a recorded "mark settled"
+  transfer; balances are computed net of payments, so the math stays correct as
+  expenses keep arriving
 - **oscar_categories**: name
-- **votes**: category (ref), nominee (text), voter (person)
+- **nominations**: category (ref), title, photo_url (nullable), proposed_by (person)
+- **votes**: category (ref), nomination (ref), voter (person) — unique per
+  (category, voter)
 - **config**: single row — wifi_ssid, wifi_password, oscars_phase
   (proposing | voting | revealed)
 
