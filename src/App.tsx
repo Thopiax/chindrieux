@@ -1,4 +1,6 @@
+import { use$ } from '@legendapp/state/react'
 import { useRoute } from './nav'
+import { myId$ } from './identity'
 import { Today } from './screens/Today'
 import { WhosHere } from './screens/WhosHere'
 import { Profiles } from './screens/Profiles'
@@ -44,6 +46,14 @@ function screenFor(route: string) {
 
 function App() {
   const route = useRoute()
+  const myId = use$(myId$)
+  if (!myId) {
+    return (
+      <main style={{ maxWidth: 640, margin: '0 auto', padding: 16 }}>
+        <Onboarding />
+      </main>
+    )
+  }
   return (
     <main style={{ maxWidth: 640, margin: '0 auto', padding: 16 }}>
       <nav aria-label="Screens" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
