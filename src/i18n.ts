@@ -9,7 +9,7 @@ export type Lang = (typeof LANGS)[number]
 // scrapbook. Portuguese is pt-BR (você, Brazilian vocab), French is informal
 // (tutoiement), Dutch is informal (je/jij). No em dashes in any language.
 export const dict = {
-  'common.save': { en: 'Save', fr: 'Enregistrer', pt: 'Salvar', nl: 'Bewaren' },
+  'common.save': { en: 'Save', fr: 'Enregistrer', pt: 'Salvar', nl: 'Opslaan' },
   'common.cancel': { en: 'Cancel', fr: 'Annuler', pt: 'Cancelar', nl: 'Annuleren' },
   'common.edit': { en: 'Edit', fr: 'Modifier', pt: 'Editar', nl: 'Bewerken' },
   'common.delete': { en: 'Delete', fr: 'Supprimer', pt: 'Excluir', nl: 'Verwijderen' },
@@ -17,7 +17,7 @@ export const dict = {
   'common.add': { en: 'Add', fr: 'Ajouter', pt: 'Adicionar', nl: 'Toevoegen' },
 
   'today.title': { en: 'Today', fr: "Aujourd'hui", pt: 'Hoje', nl: 'Vandaag' },
-  'whoshere.title': { en: "Who's here", fr: 'Qui est là', pt: 'Quem tá aqui', nl: 'Wie is er' },
+  'whoshere.title': { en: "Who's here", fr: 'Qui est là', pt: 'Quem tá aqui', nl: 'Wie is er allemaal' },
   'profiles.title': { en: 'The crew', fr: 'La bande', pt: 'A turma', nl: 'De bende' },
   'costs.title': { en: 'Costs', fr: 'Les comptes', pt: 'As contas', nl: 'De kosten' },
   'tournaments.title': { en: 'Tournaments', fr: 'Tournois', pt: 'Torneios', nl: 'Toernooien' },
@@ -33,7 +33,7 @@ export const dict = {
   'onboarding.vibes.blaze': { en: 'Down to blaze', fr: 'Chaud pour un joint', pt: 'Topa fumar', nl: 'Zin om te blowen' },
   'onboarding.vibes.drink': { en: 'Down to drink', fr: 'Chaud pour boire', pt: 'Topa beber', nl: 'Zin om te drinken' },
   'onboarding.vibes.hasCar': { en: 'Has a car', fr: 'A une voiture', pt: 'Tem carro', nl: 'Heeft een auto' },
-  'onboarding.vibes.worldCupTeam': { en: 'World Cup team', fr: 'Équipe de coupe du monde', pt: 'Time da Copa', nl: 'WK-team' },
+  'onboarding.vibes.worldCupTeam': { en: 'World Cup team', fr: 'Équipe de Coupe du Monde', pt: 'Time da Copa', nl: 'WK-team' },
   'onboarding.vibes.workChill': { en: 'Work or chill', fr: 'Boulot ou chill', pt: 'Trabalho ou relax', nl: 'Werk of chill' },
 
   'langSwitcher.label': { en: 'Language', fr: 'Langue', pt: 'Idioma', nl: 'Taal' },

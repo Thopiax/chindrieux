@@ -26,8 +26,8 @@ describe('interpolate', () => {
 
 describe('translate', () => {
   test('returns the string for a known key and language', () => {
-    expect(translate('en', 'common.save')).toBe(dict['common.save'].en)
-    expect(translate('pt', 'common.save')).toBe(dict['common.save'].pt)
+    expect(translate('pt', 'common.save')).toBe('Salvar')
+    expect(translate('fr', 'common.save')).toBe('Enregistrer')
   })
   test('returns the key itself for a missing key', () => {
     expect(translate('en', 'nope.missing')).toBe('nope.missing')

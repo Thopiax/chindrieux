@@ -8,12 +8,19 @@ const flags: Record<Lang, string> = {
   nl: '🇳🇱',
 }
 
+const names: Record<Lang, string> = {
+  en: 'English',
+  fr: 'Français',
+  pt: 'Português',
+  nl: 'Nederlands',
+}
+
 export function LangSwitcher() {
   const t = useT()
   const current = use$(lang$)
   return (
     <div
-      role="group"
+      role="radiogroup"
       aria-label={t('langSwitcher.label')}
       style={{ display: 'flex', gap: 4 }}
     >
@@ -21,9 +28,11 @@ export function LangSwitcher() {
         <button
           key={l}
           type="button"
-          aria-pressed={current === l}
+          role="radio"
+          aria-checked={current === l}
+          aria-label={names[l]}
           onClick={() => lang$.set(l)}
-          title={l}
+          title={names[l]}
           style={{
             fontSize: 20,
             lineHeight: 1,
