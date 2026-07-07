@@ -1,0 +1,91 @@
+// ponytail: a flat object and a lookup, not an i18n framework
+import { observable } from '@legendapp/state'
+import { use$ } from '@legendapp/state/react'
+
+export const LANGS = ['en', 'fr', 'pt', 'nl'] as const
+export type Lang = (typeof LANGS)[number]
+
+// Flat dict keyed like `today.title`. Warm, playful, short: a summer-camp
+// scrapbook. Portuguese is pt-BR (você, Brazilian vocab), French is informal
+// (tutoiement), Dutch is informal (je/jij). No em dashes in any language.
+export const dict = {
+  'common.save': { en: 'Save', fr: 'Enregistrer', pt: 'Salvar', nl: 'Bewaren' },
+  'common.cancel': { en: 'Cancel', fr: 'Annuler', pt: 'Cancelar', nl: 'Annuleren' },
+  'common.edit': { en: 'Edit', fr: 'Modifier', pt: 'Editar', nl: 'Bewerken' },
+  'common.delete': { en: 'Delete', fr: 'Supprimer', pt: 'Excluir', nl: 'Verwijderen' },
+  'common.back': { en: 'Back', fr: 'Retour', pt: 'Voltar', nl: 'Terug' },
+  'common.add': { en: 'Add', fr: 'Ajouter', pt: 'Adicionar', nl: 'Toevoegen' },
+
+  'today.title': { en: 'Today', fr: "Aujourd'hui", pt: 'Hoje', nl: 'Vandaag' },
+  'whoshere.title': { en: "Who's here", fr: 'Qui est là', pt: 'Quem tá aqui', nl: 'Wie is er' },
+  'profiles.title': { en: 'The crew', fr: 'La bande', pt: 'A turma', nl: 'De bende' },
+  'costs.title': { en: 'Costs', fr: 'Les comptes', pt: 'As contas', nl: 'De kosten' },
+  'tournaments.title': { en: 'Tournaments', fr: 'Tournois', pt: 'Torneios', nl: 'Toernooien' },
+  'oscars.title': { en: 'Oscars', fr: 'Les Oscars', pt: 'Oscars', nl: 'De Oscars' },
+  'wifi.title': { en: 'Wifi', fr: 'Wifi', pt: 'Wi-Fi', nl: 'Wifi' },
+
+  'onboarding.title': { en: 'Welcome', fr: 'Bienvenue', pt: 'Bem-vindo', nl: 'Welkom' },
+  'onboarding.whoAreYou': { en: 'Who are you?', fr: "C'est qui, toi ?", pt: 'Quem é você?', nl: 'Wie ben jij?' },
+  'onboarding.imNew': { en: "I'm new here", fr: 'Je suis nouveau', pt: 'Sou novo por aqui', nl: 'Ik ben nieuw' },
+  'onboarding.buildYourBadge': { en: 'Build your badge', fr: 'Fais ton badge', pt: 'Monte seu crachá', nl: 'Maak je badge' },
+  'onboarding.arrival': { en: 'Arrival', fr: 'Arrivée', pt: 'Chegada', nl: 'Aankomst' },
+  'onboarding.departure': { en: 'Departure', fr: 'Départ', pt: 'Partida', nl: 'Vertrek' },
+  'onboarding.vibes.blaze': { en: 'Down to blaze', fr: 'Chaud pour un joint', pt: 'Topa fumar', nl: 'Zin om te blowen' },
+  'onboarding.vibes.drink': { en: 'Down to drink', fr: 'Chaud pour boire', pt: 'Topa beber', nl: 'Zin om te drinken' },
+  'onboarding.vibes.hasCar': { en: 'Has a car', fr: 'A une voiture', pt: 'Tem carro', nl: 'Heeft een auto' },
+  'onboarding.vibes.worldCupTeam': { en: 'World Cup team', fr: 'Équipe de coupe du monde', pt: 'Time da Copa', nl: 'WK-team' },
+  'onboarding.vibes.workChill': { en: 'Work or chill', fr: 'Boulot ou chill', pt: 'Trabalho ou relax', nl: 'Werk of chill' },
+
+  'langSwitcher.label': { en: 'Language', fr: 'Langue', pt: 'Idioma', nl: 'Taal' },
+} satisfies Record<string, Record<Lang, string>>
+
+const STORAGE_KEY = 'chindrieux.lang'
+
+function isLang(value: string | null | undefined): value is Lang {
+  return value != null && (LANGS as readonly string[]).includes(value)
+}
+
+// Map a navigator.language string (e.g. 'pt-BR') to a supported Lang by its
+// two-letter prefix; unknown or missing falls back to en.
+export function pickLang(navLang: string | undefined): Lang {
+  const prefix = (navLang ?? '').slice(0, 2).toLowerCase()
+  return isLang(prefix) ? prefix : 'en'
+}
+
+// Replace every {name} placeholder with its var. Unknown placeholders are left
+// intact so a missing var is visible rather than silently blank.
+export function interpolate(template: string, vars?: Record<string, string | number>): string {
+  if (!vars) return template
+  let out = template
+  for (const [key, value] of Object.entries(vars))
+    out = out.replaceAll(`{${key}}`, String(value))
+  return out
+}
+
+// Pure lookup: resolve key in the current language, then interpolate. A missing
+// key returns the key itself (visible in dev, never throws).
+export function translate(lang: Lang, key: string, vars?: Record<string, string | number>): string {
+  const entry = (dict as Record<string, Record<Lang, string>>)[key]
+  if (!entry) return key
+  return interpolate(entry[lang], vars)
+}
+
+function initialLang(): Lang {
+  if (typeof localStorage !== 'undefined') {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (isLang(stored)) return stored
+  }
+  const navLang = typeof navigator !== 'undefined' ? navigator.language : undefined
+  return pickLang(navLang)
+}
+
+export const lang$ = observable<Lang>(initialLang())
+
+lang$.onChange(({ value }) => {
+  if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, value)
+})
+
+export function useT(): (key: string, vars?: Record<string, string | number>) => string {
+  const lang = use$(lang$)
+  return (key, vars) => translate(lang, key, vars)
+}
