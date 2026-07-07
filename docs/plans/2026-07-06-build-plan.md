@@ -467,7 +467,7 @@ test('dict is complete', () => {
 - [ ] **Step 1: Build the three phases** driven by `config$.oscars_phase.get()`:
   - **proposing:** categories as taped cards; "+ category" inline form; under each, nominations (title + optional photo + proposer Badge) and "propose a moment" form. Anyone can add either.
   - **voting:** per category, nominations as big tappable cards; tapping votes (upsert: one vote per voter per category, replace on re-tap). "You voted ✓" state. Own nominations votable (trust the group).
-  - **revealed:** ceremony mode, big typography for the TV: category name, 🏆 winning nomination + photo + vote count, one category per viewport section, scroll to advance. Ties: earliest nomination wins (domain rule).
+  - **revealed:** ceremony mode, big typography for the TV: category name, 🏆 winning nomination + photo + vote count, one category per viewport section, scroll to advance. Ties: earliest nomination wins (domain rule). This screen alone goes dark by design (velvet-dark ground, spotlight on the winner, gold accents): award ceremonies happen in dark rooms; it is theater, not a theme. The rest of the app stays light.
   - Phase control: a small footer row of three buttons (propose/vote/reveal) setting `config$.oscars_phase`, visible to everyone. `// ponytail: no host role, trust the group`
 - [ ] **Step 2: Verify** full ceremony flow with two browsers voting.
 - [ ] **Step 3: Commit** `git commit -m "feat: oscars propose, vote, and ceremony reveal"`
