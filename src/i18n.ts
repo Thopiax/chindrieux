@@ -60,6 +60,26 @@ export const dict = {
   'onboarding.vibes.workChill': { en: 'Work or chill', fr: 'Boulot ou chill', pt: 'Trabalho ou relax', nl: 'Werk of chill' },
 
   'langSwitcher.label': { en: 'Language', fr: 'Langue', pt: 'Idioma', nl: 'Taal' },
+
+  'costs.addExpense': { en: '+ Add an expense', fr: '+ Ajouter une dépense', pt: '+ Adicionar despesa', nl: '+ Uitgave toevoegen' },
+  'costs.newExpense': { en: 'New expense', fr: 'Nouvelle dépense', pt: 'Nova despesa', nl: 'Nieuwe uitgave' },
+  'costs.editExpense': { en: 'Edit expense', fr: 'Modifier la dépense', pt: 'Editar despesa', nl: 'Uitgave bewerken' },
+  'costs.empty': { en: 'No expenses yet. Add the first one!', fr: 'Pas encore de dépenses. Ajoute la première !', pt: 'Nenhuma despesa ainda. Adicione a primeira!', nl: 'Nog geen uitgaven. Voeg de eerste toe!' },
+  'costs.whatFor': { en: 'What was it for?', fr: "C'était pour quoi ?", pt: 'Foi pra quê?', nl: 'Waarvoor was het?' },
+  'costs.labelPlaceholder': { en: 'e.g. Groceries', fr: 'ex. Les courses', pt: 'ex. Mercado', nl: 'bijv. Boodschappen' },
+  'costs.amount': { en: 'Amount', fr: 'Montant', pt: 'Valor', nl: 'Bedrag' },
+  'costs.date': { en: 'Date', fr: 'Date', pt: 'Data', nl: 'Datum' },
+  'costs.whoPaid': { en: 'Who paid?', fr: 'Qui a payé ?', pt: 'Quem pagou?', nl: 'Wie heeft betaald?' },
+  'costs.splitBetween': { en: 'Split between', fr: 'À partager entre', pt: 'Dividir entre', nl: 'Verdelen over' },
+  'costs.addPhoto': { en: 'Add a photo', fr: 'Ajoute une photo', pt: 'Adicionar foto', nl: 'Foto toevoegen' },
+  'costs.uploading': { en: 'Uploading...', fr: 'Envoi...', pt: 'Enviando...', nl: 'Uploaden...' },
+  'costs.tapAgain': { en: 'Tap again to delete', fr: 'Appuie encore pour supprimer', pt: 'Toque de novo pra excluir', nl: 'Tik nog eens om te verwijderen' },
+  'costs.settleUp': { en: 'Settle up', fr: 'On se rembourse', pt: 'Acertar as contas', nl: 'Afrekenen' },
+  'costs.allSquare': { en: 'All square! Nobody owes anything.', fr: 'Tout est réglé ! Personne ne doit rien.', pt: 'Tudo quitado! Ninguém deve nada.', nl: 'Alles gelijk! Niemand is iets schuldig.' },
+  'costs.markPaid': { en: 'Mark paid', fr: 'Marquer payé', pt: 'Marcar como pago', nl: 'Markeer als betaald' },
+  'costs.ibanPrompt': { en: 'Add your IBAN so friends can pay you', fr: 'Ajoute ton IBAN pour que les copains te remboursent', pt: 'Adicione seu IBAN pra galera te pagar', nl: 'Voeg je IBAN toe zodat vrienden je kunnen betalen' },
+  'costs.ibanPlaceholder': { en: 'Your IBAN', fr: 'Ton IBAN', pt: 'Seu IBAN', nl: 'Je IBAN' },
+  'costs.settled': { en: '{from} paid {to} {amount}', fr: '{from} a payé {amount} à {to}', pt: '{from} pagou {amount} pra {to}', nl: '{from} betaalde {amount} aan {to}' },
 } satisfies Record<string, Record<Lang, string>>
 
 const STORAGE_KEY = 'chindrieux.lang'
