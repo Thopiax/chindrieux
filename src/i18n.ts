@@ -21,6 +21,7 @@ export const dict = {
   'today.myProfile': { en: 'My profile', fr: 'Mon profil', pt: 'Meu perfil', nl: 'Mijn profiel' },
   'today.navAria': { en: 'Screens', fr: 'Écrans', pt: 'Telas', nl: 'Schermen' },
   'today.daysToGo': { en: '{n} days to go ☀️', fr: 'Plus que {n} jours ☀️', pt: 'Faltam {n} dias ☀️', nl: 'Nog {n} dagen ☀️' },
+  'today.daysToGo.one': { en: '{n} day to go ☀️', fr: 'Plus que {n} jour ☀️', pt: 'Falta {n} dia ☀️', nl: 'Nog {n} dag ☀️' },
   'today.rosterSoFar': { en: 'The crew so far', fr: 'La bande pour le moment', pt: 'A turma até agora', nl: 'De bende tot nu toe' },
   'today.stillMissing': { en: 'Still missing a badge or dates: {names}', fr: 'Badge ou dates manquants : {names}', pt: 'Ainda sem crachá ou datas: {names}', nl: 'Nog geen badge of datums: {names}' },
   'today.shareLink': { en: 'Share the link 💌', fr: 'Partage le lien 💌', pt: 'Compartilhe o link 💌', nl: 'Deel de link 💌' },
@@ -33,6 +34,7 @@ export const dict = {
   'today.voteNudge': { en: 'The Oscars are open. Vote now!', fr: 'Les Oscars sont ouverts. Vote maintenant !', pt: 'O Oscar abriu. Vote agora!', nl: 'De Oscars zijn open. Stem nu!' },
   'today.wrap': { en: "That's a wrap 🎬", fr: 'Clap de fin 🎬', pt: 'Fim de filmagem 🎬', nl: "Dat was 'm 🎬" },
   'today.transfersLeft': { en: '{n} transfers left to settle up', fr: '{n} virements pour solder les comptes', pt: '{n} transferências pra acertar as contas', nl: '{n} overboekingen om af te rekenen' },
+  'today.transfersLeft.one': { en: '{n} transfer left to settle up', fr: '{n} virement pour solder les comptes', pt: '{n} transferência pra acertar as contas', nl: '{n} overboeking om af te rekenen' },
   'today.youOwe': { en: 'You owe {amount}', fr: 'Tu dois {amount}', pt: 'Você deve {amount}', nl: 'Je bent {amount} schuldig' },
   'today.youAreOwed': { en: 'You get {amount} back', fr: 'On te doit {amount}', pt: 'Você recebe {amount} de volta', nl: 'Je krijgt {amount} terug' },
   'today.ceremonyLink': { en: 'See the winners 🏆', fr: 'Découvre les gagnants 🏆', pt: 'Veja os vencedores 🏆', nl: 'Bekijk de winnaars 🏆' },
@@ -46,12 +48,14 @@ export const dict = {
   'wifi.title': { en: 'Wifi', fr: 'Wifi', pt: 'Wi-Fi', nl: 'Wifi' },
   'wifi.networkName': { en: 'Network name', fr: 'Nom du réseau', pt: 'Nome da rede', nl: 'Netwerknaam' },
   'wifi.password': { en: 'Password', fr: 'Mot de passe', pt: 'Senha', nl: 'Wachtwoord' },
-  'wifi.networkPlaceholder': { en: 'e.g. Chalet-Guest', fr: 'ex. Chalet-Invite', pt: 'ex. Chale-Visitante', nl: 'bijv. Chalet-Gast' },
+  'wifi.networkPlaceholder': { en: 'e.g. Chalet-Guest', fr: 'ex. Chalet-Invité', pt: 'ex. Chalé-Visitante', nl: 'bijv. Chalet-Gast' },
   'wifi.passwordPlaceholder': { en: 'The wifi password', fr: 'Le mot de passe du wifi', pt: 'A senha do Wi-Fi', nl: 'Het wifi-wachtwoord' },
   'wifi.tapToCopy': { en: 'Tap to copy', fr: 'Appuie pour copier', pt: 'Toque para copiar', nl: 'Tik om te kopiëren' },
   'wifi.copied': { en: 'Copied!', fr: 'Copié !', pt: 'Copiado!', nl: 'Gekopieerd!' },
   'wifi.scanToJoin': { en: 'Scan to hop on', fr: 'Scanne pour te connecter', pt: 'Escaneie para entrar', nl: 'Scan om te verbinden' },
   'wifi.qrAlt': { en: 'Wifi join code', fr: 'QR code du wifi', pt: 'QR code do Wi-Fi', nl: 'Wifi-QR-code' },
+  'wifi.qrFailed': { en: 'Could not make the QR code.', fr: 'Impossible de créer le QR code.', pt: 'Não deu para gerar o QR code.', nl: 'Kon de QR-code niet maken.' },
+  'wifi.copyFailed': { en: 'Copy failed. Select it to copy.', fr: 'Copie impossible. Sélectionne pour copier.', pt: 'Não copiou. Selecione para copiar.', nl: 'Kopiëren mislukt. Selecteer om te kopiëren.' },
 
   'screen.backToToday': { en: 'Back to today', fr: "Retour à aujourd'hui", pt: 'Voltar para hoje', nl: 'Terug naar vandaag' },
 
@@ -67,6 +71,7 @@ export const dict = {
   'profiles.empty': { en: 'Nobody here yet', fr: 'Personne pour le moment', pt: 'Ninguém por aqui ainda', nl: 'Nog niemand hier' },
 
   'common.close': { en: 'Close', fr: 'Fermer', pt: 'Fechar', nl: 'Sluiten' },
+  'common.uploadFailed': { en: 'Upload failed. Try again.', fr: "Échec de l'envoi. Réessaie.", pt: 'Falha no envio. Tente de novo.', nl: 'Uploaden mislukt. Probeer opnieuw.' },
 
   'onboarding.title': { en: 'Welcome', fr: 'Bienvenue', pt: 'Bem-vindo', nl: 'Welkom' },
   'onboarding.whoAreYou': { en: 'Who are you?', fr: "C'est qui, toi ?", pt: 'Quem é você?', nl: 'Wie ben jij?' },

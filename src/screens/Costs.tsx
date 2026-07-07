@@ -286,6 +286,7 @@ function ExpenseForm({
   )
   const [photoUrl, setPhotoUrl] = useState<string | null>(initial?.photo_url ?? null)
   const [uploading, setUploading] = useState(false)
+  const [uploadFailed, setUploadFailed] = useState(false)
 
   const checked = checkedFor(people, date, overrides)
   const amountNum = Math.round(Number(amount) * 100) / 100
@@ -355,14 +356,20 @@ function ExpenseForm({
               const file = e.target.files?.[0]
               if (!file) return
               setUploading(true)
+              setUploadFailed(false)
               try {
                 setPhotoUrl(await uploadPhoto(file))
+              } catch {
+                setUploadFailed(true)
               } finally {
                 setUploading(false)
               }
             }}
           />
           {uploading && <p style={{ fontSize: 13 }}>{t('costs.uploading')}</p>}
+          {uploadFailed && !uploading && (
+            <p style={{ fontSize: 13, color: 'var(--color-tomato)', fontWeight: 700 }}>{t('common.uploadFailed')}</p>
+          )}
           {photoUrl && !uploading && (
             <img src={photoUrl} alt="" style={{ marginTop: 8, width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--color-ink)' }} />
           )}

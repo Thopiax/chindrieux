@@ -125,27 +125,32 @@ function WifiCard({
   onEdit: () => void
 }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null)
+  const [qrFailed, setQrFailed] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copyFailed, setCopyFailed] = useState(false)
 
   // Regenerate the join-QR whenever the credentials change. WPA covers the
   // common getaway router; the trailing ;; closes the payload.
   useEffect(() => {
     let alive = true
+    setQrFailed(false)
     const payload = `WIFI:T:WPA;S:${esc(ssid)};P:${esc(password)};;`
     QRCode.toDataURL(payload, { width: 240, margin: 1 })
       .then((url) => { if (alive) setDataUrl(url) })
-      .catch(() => { if (alive) setDataUrl(null) })
+      .catch(() => { if (alive) { setDataUrl(null); setQrFailed(true) } })
     return () => { alive = false }
   }, [ssid, password])
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(password)
+      setCopyFailed(false)
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
       // Clipboard unavailable (older browser or denied): leave the value on
-      // screen so it can still be typed by hand.
+      // screen so it can still be typed by hand, and say so.
+      setCopyFailed(true)
     }
   }
 
@@ -188,6 +193,11 @@ function WifiCard({
               {copied ? t('wifi.copied') : t('wifi.tapToCopy')}
             </span>
           </button>
+          {copyFailed && (
+            <p style={{ fontSize: 13, color: 'var(--color-tomato)', fontWeight: 700, margin: '-12px 0 20px' }}>
+              {t('wifi.copyFailed')}
+            </p>
+          )}
         </>
       )}
 
@@ -205,6 +215,10 @@ function WifiCard({
           />
           <p style={{ marginTop: 8, fontWeight: 700 }}>{t('wifi.scanToJoin')}</p>
         </div>
+      )}
+
+      {qrFailed && (
+        <p style={{ fontSize: 13, color: 'var(--color-tomato)', fontWeight: 700 }}>{t('wifi.qrFailed')}</p>
       )}
 
       <button type="button" onClick={onEdit} style={{ ...ghostBtn, marginTop: 16 }}>

@@ -103,11 +103,14 @@ function Before({ t, people, today }: { t: T; people: Person[]; today: string })
   const missing = people.filter((p) => !p.avatar_emoji || !p.arrival || !p.departure)
   return (
     <div style={stack}>
-      {range && (
-        <Card>
-          <p style={bigLine}>{t('today.daysToGo', { n: daysUntil(today, range.start) })}</p>
-        </Card>
-      )}
+      {range && (() => {
+        const n = daysUntil(today, range.start)
+        return (
+          <Card>
+            <p style={bigLine}>{t(n === 1 ? 'today.daysToGo.one' : 'today.daysToGo', { n })}</p>
+          </Card>
+        )
+      })()}
       {people.length > 0 && (
         <Card>
           <p style={cardHeading}>{t('today.rosterSoFar')}</p>
@@ -198,7 +201,7 @@ function After({ t, myId }: { t: T; myId: string | null }) {
         <a href="#/costs" style={{ fontWeight: 700, color: 'var(--color-ink)' }}>
           💸 {transfers.length === 0
             ? t('costs.allSquare')
-            : t('today.transfersLeft', { n: transfers.length })}
+            : t(transfers.length === 1 ? 'today.transfersLeft.one' : 'today.transfersLeft', { n: transfers.length })}
         </a>
         {myBalance !== 0 && (
           <p style={{ margin: '8px 0 0', fontSize: 14 }}>

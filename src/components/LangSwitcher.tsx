@@ -1,5 +1,6 @@
 import { use$ } from '@legendapp/state/react'
 import { LANGS, lang$, useT, type Lang } from '../i18n.ts'
+import { handleRadioKeydown, radioTabIndex } from '../a11y.ts'
 
 const flags: Record<Lang, string> = {
   en: '🇬🇧',
@@ -22,6 +23,7 @@ export function LangSwitcher() {
     <div
       role="radiogroup"
       aria-label={t('langSwitcher.label')}
+      onKeyDown={(e) => handleRadioKeydown(e, LANGS, current, (l) => lang$.set(l))}
       style={{ display: 'flex', gap: 4 }}
     >
       {LANGS.map((l) => (
@@ -31,11 +33,16 @@ export function LangSwitcher() {
           role="radio"
           aria-checked={current === l}
           aria-label={names[l]}
+          tabIndex={radioTabIndex(l, current, LANGS)}
           onClick={() => lang$.set(l)}
           title={names[l]}
           style={{
             fontSize: 20,
             lineHeight: 1,
+            minWidth: 44,
+            minHeight: 44,
+            display: 'grid',
+            placeItems: 'center',
             padding: 4,
             background: 'none',
             border: 'none',

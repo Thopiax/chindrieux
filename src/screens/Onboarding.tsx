@@ -4,6 +4,7 @@ import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { COLORS, EMOJIS } from '../avatars.ts'
 import { useT } from '../i18n.ts'
+import { handleRadioKeydown, radioTabIndex } from '../a11y.ts'
 import { myId$ } from '../identity.ts'
 import { go } from '../nav.ts'
 import { people$, useRows } from '../store.ts'
@@ -327,6 +328,7 @@ function StepBadge({
       <div
         role="radiogroup"
         aria-label={t('onboarding.pickEmoji')}
+        onKeyDown={(ev) => handleRadioKeydown(ev, EMOJIS, form.emoji, onEmoji)}
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(44px, 1fr))',
@@ -340,10 +342,12 @@ function StepBadge({
             type="button"
             role="radio"
             aria-checked={form.emoji === e}
+            tabIndex={radioTabIndex(e, form.emoji, EMOJIS)}
             onClick={() => onEmoji(e)}
             style={{
               fontSize: 24,
               lineHeight: 1,
+              minHeight: 44,
               padding: 6,
               borderRadius: 8,
               cursor: 'pointer',
@@ -360,6 +364,7 @@ function StepBadge({
       <div
         role="radiogroup"
         aria-label={t('onboarding.pickColor')}
+        onKeyDown={(ev) => handleRadioKeydown(ev, COLORS, form.color, onColor)}
         style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 }}
       >
         {COLORS.map((c) => (
@@ -369,10 +374,11 @@ function StepBadge({
             role="radio"
             aria-checked={form.color === c}
             aria-label={c}
+            tabIndex={radioTabIndex(c, form.color, COLORS)}
             onClick={() => onColor(c)}
             style={{
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               borderRadius: 9999,
               cursor: 'pointer',
               background: c,

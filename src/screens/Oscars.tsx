@@ -223,6 +223,7 @@ function NominationForm({ t, categoryId, myId }: { t: T; categoryId: string; myI
   const [title, setTitle] = useState('')
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadFailed, setUploadFailed] = useState(false)
 
   const canSave = title.trim() !== ''
 
@@ -266,14 +267,20 @@ function NominationForm({ t, categoryId, myId }: { t: T; categoryId: string; myI
             const file = e.target.files?.[0]
             if (!file) return
             setUploading(true)
+            setUploadFailed(false)
             try {
               setPhotoUrl(await uploadPhoto(file))
+            } catch {
+              setUploadFailed(true)
             } finally {
               setUploading(false)
             }
           }}
         />
         {uploading && <p style={{ fontSize: 13 }}>{t('oscars.uploading')}</p>}
+        {uploadFailed && !uploading && (
+          <p style={{ fontSize: 13, color: 'var(--color-tomato)', fontWeight: 700 }}>{t('common.uploadFailed')}</p>
+        )}
         {photoUrl && !uploading && (
           <img src={photoUrl} alt="" style={{ marginTop: 8, width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--color-ink)' }} />
         )}
