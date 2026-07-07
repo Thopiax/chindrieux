@@ -1,4 +1,4 @@
--- Chindrieux getaway — Supabase schema.
+-- Chindrieux getaway: Supabase schema.
 -- Paste this whole file into the Supabase SQL editor once, on a fresh project.
 --
 -- Sync model: legend-state syncs each table with a soft-delete trio
