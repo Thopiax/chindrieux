@@ -24,6 +24,17 @@ export const dict = {
   'oscars.title': { en: 'Oscars', fr: 'Les Oscars', pt: 'Oscars', nl: 'De Oscars' },
   'wifi.title': { en: 'Wifi', fr: 'Wifi', pt: 'Wi-Fi', nl: 'Wifi' },
 
+  'screen.backToToday': { en: 'Back to today', fr: "Retour à aujourd'hui", pt: 'Voltar para hoje', nl: 'Terug naar vandaag' },
+
+  'profiles.addPerson': { en: '+ Add person', fr: "+ Ajouter quelqu'un", pt: '+ Adicionar pessoa', nl: '+ Iemand toevoegen' },
+  'profiles.editMyProfile': { en: 'Edit my profile', fr: 'Modifier mon profil', pt: 'Editar meu perfil', nl: 'Mijn profiel bewerken' },
+  'profiles.addTitle': { en: 'Who is joining?', fr: 'Qui nous rejoint ?', pt: 'Quem tá chegando?', nl: 'Wie komt erbij?' },
+  'profiles.theirName': { en: 'Their name', fr: 'Son prénom', pt: 'O nome da pessoa', nl: 'Hun naam' },
+  'profiles.datesTbd': { en: 'Dates to come', fr: 'Dates à venir', pt: 'Datas a definir', nl: 'Data volgt nog' },
+  'profiles.empty': { en: 'Nobody here yet', fr: 'Personne pour le moment', pt: 'Ninguém por aqui ainda', nl: 'Nog niemand hier' },
+
+  'common.close': { en: 'Close', fr: 'Fermer', pt: 'Fechar', nl: 'Sluiten' },
+
   'onboarding.title': { en: 'Welcome', fr: 'Bienvenue', pt: 'Bem-vindo', nl: 'Welkom' },
   'onboarding.whoAreYou': { en: 'Who are you?', fr: "C'est qui, toi ?", pt: 'Quem é você?', nl: 'Wie ben jij?' },
   'onboarding.imNew': { en: "I'm new here", fr: 'Je suis nouveau', pt: 'Sou novo por aqui', nl: 'Ik ben nieuw' },

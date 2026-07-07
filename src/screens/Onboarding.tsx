@@ -37,6 +37,26 @@ const emptyForm: Form = {
   mode: 50,
 }
 
+// Hydrate the editable form from a saved person (shared by edit mode and the
+// existing-person picker).
+const formFromPerson = (p: Person): Form => ({
+  name: p.name,
+  emoji: p.avatar_emoji,
+  color: p.avatar_color,
+  arrival: p.arrival ?? '',
+  departure: p.departure ?? '',
+  blaze: p.blaze ?? false,
+  drink: p.drink ?? false,
+  hasCar: p.has_car ?? false,
+  team: p.world_cup_team ?? '',
+  mode: p.mode ?? 50,
+})
+
+// first-run: fresh guest picking themselves (sets myId$).
+// edit: reopen my saved profile prefilled (keeps myId$).
+// add: create someone else without claiming them (never sets myId$).
+export type OnboardingMode = 'first-run' | 'edit' | 'add'
+
 const primaryBtn = {
   fontFamily: 'inherit',
   fontWeight: 700,
@@ -60,30 +80,37 @@ const ghostBtn = {
   padding: 4,
 } as const
 
-export function Onboarding() {
+export function Onboarding({
+  mode = 'first-run',
+  onDone,
+}: {
+  mode?: OnboardingMode
+  onDone?: () => void
+} = {}) {
   const t = useT()
   const people = useRows(people$)
-  const [step, setStep] = useState<Step>(1)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [form, setForm] = useState<Form>(emptyForm)
+  // Edit mode opens straight on the badge step, prefilled from my saved row.
+  const [step, setStep] = useState<Step>(() => (mode === 'edit' ? 2 : 1))
+  const [selectedId, setSelectedId] = useState<string | null>(() =>
+    mode === 'edit' ? (myId$.peek() ?? null) : null,
+  )
+  const [form, setForm] = useState<Form>(() => {
+    if (mode === 'edit') {
+      const id = myId$.peek()
+      const me = id ? (people$[id].peek() as Person | undefined) : undefined
+      if (me) return formFromPerson(me)
+    }
+    return emptyForm
+  })
 
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((f) => ({ ...f, [key]: value }))
 
+  const finish = () => (onDone ? onDone() : go(''))
+
   const pickExisting = (p: Person) => {
     setSelectedId(p.id)
-    setForm({
-      name: p.name,
-      emoji: p.avatar_emoji,
-      color: p.avatar_color,
-      arrival: p.arrival ?? '',
-      departure: p.departure ?? '',
-      blaze: p.blaze ?? false,
-      drink: p.drink ?? false,
-      hasCar: p.has_car ?? false,
-      team: p.world_cup_team ?? '',
-      mode: p.mode ?? 50,
-    })
+    setForm(formFromPerson(p))
     setStep(2)
   }
 
@@ -112,20 +139,35 @@ export function Onboarding() {
       const row: Person = { id, iban: null, ...fields }
       people$[id].set(row)
     }
-    myId$.set(id)
-    go('')
+    // Adding someone else never claims them as me; first-run and edit do.
+    if (mode !== 'add') myId$.set(id)
+    finish()
   }
+
+  const title =
+    mode === 'edit'
+      ? t('profiles.editMyProfile')
+      : mode === 'add'
+        ? t('profiles.addTitle')
+        : t('onboarding.title')
 
   return (
     <section>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 className="marker-underline">{t('onboarding.title')}</h1>
-        <LangSwitcher />
+        <h1 className="marker-underline">{title}</h1>
+        {mode === 'first-run' ? (
+          <LangSwitcher />
+        ) : (
+          <button type="button" onClick={finish} style={ghostBtn}>
+            {t('common.close')}
+          </button>
+        )}
       </div>
 
       {step === 1 && (
         <StepWho
           t={t}
+          mode={mode}
           people={people}
           name={form.name}
           onName={(v) => set('name', v)}
@@ -140,7 +182,7 @@ export function Onboarding() {
           form={form}
           onEmoji={(v) => set('emoji', v)}
           onColor={(v) => set('color', v)}
-          onBack={() => setStep(1)}
+          onBack={mode === 'edit' ? finish : () => setStep(1)}
           onNext={() => setStep(3)}
         />
       )}
@@ -162,6 +204,7 @@ type T = ReturnType<typeof useT>
 
 function StepWho({
   t,
+  mode,
   people,
   name,
   onName,
@@ -169,16 +212,20 @@ function StepWho({
   onNew,
 }: {
   t: T
+  mode: OnboardingMode
   people: Person[]
   name: string
   onName: (v: string) => void
   onPick: (p: Person) => void
   onNew: () => void
 }) {
+  // Adding someone else is always a new person: skip the "that's me" picker and
+  // ask only for their name.
+  const adding = mode === 'add'
   return (
     <div>
-      <h2>{t('onboarding.whoAreYou')}</h2>
-      {people.length > 0 && (
+      <h2>{adding ? t('profiles.addTitle') : t('onboarding.whoAreYou')}</h2>
+      {!adding && people.length > 0 && (
         <div
           style={{
             display: 'grid',
@@ -214,7 +261,7 @@ function StepWho({
 
       <Card>
         <label htmlFor="name" style={{ display: 'block', fontWeight: 700, marginBottom: 8 }}>
-          {t('onboarding.imNew')}
+          {adding ? t('profiles.theirName') : t('onboarding.imNew')}
         </label>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <input
