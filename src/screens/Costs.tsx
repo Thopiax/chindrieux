@@ -11,15 +11,10 @@ import { balances, suggestTransfers } from '../domain/money.ts'
 import { presentOn } from '../domain/presence.ts'
 import type { Expense, Payment, Person } from '../domain/types.ts'
 import { uploadPhoto } from '../photos.ts'
+import { routeQuery } from '../nav.ts'
+import { todayISO } from '../today.ts'
 
 type T = ReturnType<typeof useT>
-
-// Local yyyy-mm-dd for the date input default (never drifts a day off UTC).
-function today(): string {
-  const d = new Date()
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
 
 // Always two decimals with the euro sign; caller supplies euros.
 function fmtEur(euros: number): string {
@@ -82,8 +77,17 @@ export function Costs() {
 
   // Closed, adding, or editing a specific expense. The form remounts fresh each
   // time it opens (keyed below) so its pre-check starts from presence again.
-  const [form, setForm] = useState<{ mode: 'add' } | { mode: 'edit'; expense: Expense } | null>(null)
+  // Arriving via '#/costs?new' (the home screen's one-tap) opens the add form.
+  const [form, setForm] = useState<{ mode: 'add' } | { mode: 'edit'; expense: Expense } | null>(
+    () => (routeQuery().has('new') ? { mode: 'add' } : null),
+  )
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+
+  // Drop the '?new' marker once the form closes so a reload stays closed.
+  const closeForm = () => {
+    setForm(null)
+    if (routeQuery().has('new')) history.replaceState(null, '', '#/costs')
+  }
 
   const byId = new Map(people.map((p) => [p.id, p]))
   const nameOf = (id: string) => byId.get(id)?.name ?? '?'
@@ -97,7 +101,7 @@ export function Costs() {
           people={people}
           myId={myId}
           initial={form.mode === 'edit' ? form.expense : null}
-          onClose={() => setForm(null)}
+          onClose={closeForm}
         />
       </Screen>
     )
@@ -275,7 +279,7 @@ function ExpenseForm({
 }) {
   const [label, setLabel] = useState(initial?.label ?? '')
   const [amount, setAmount] = useState(initial ? String(initial.amount) : '')
-  const [date, setDate] = useState(initial?.date ?? today())
+  const [date, setDate] = useState(initial?.date ?? todayISO())
   const [payerId, setPayerId] = useState(initial?.payer_id ?? myId)
   const [overrides, setOverrides] = useState<Record<string, boolean>>(() =>
     initial ? overridesFromExpense(people, initial) : {},

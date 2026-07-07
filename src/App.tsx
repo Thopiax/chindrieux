@@ -10,19 +10,6 @@ import { Oscars } from './screens/Oscars'
 import { Wifi } from './screens/Wifi'
 import { Onboarding } from './screens/Onboarding'
 
-type NavLink = { route: string; label: string }
-
-const links: readonly NavLink[] = [
-  { route: '', label: 'Today' },
-  { route: 'whoshere', label: "Who's here" },
-  { route: 'profiles', label: 'Profiles' },
-  { route: 'costs', label: 'Costs' },
-  { route: 'tournaments', label: 'Tournaments' },
-  { route: 'oscars', label: 'Oscars' },
-  { route: 'wifi', label: 'Wifi' },
-  { route: 'onboarding', label: 'Onboarding' },
-]
-
 function screenFor(route: string) {
   switch (route) {
     case 'whoshere':
@@ -54,15 +41,10 @@ function App() {
       </main>
     )
   }
+  // Today is the front door: it carries the sticker-card navigation, and every
+  // other screen carries a back-to-today link, so no global nav bar is needed.
   return (
     <main style={{ maxWidth: 640, margin: '0 auto', padding: 16 }}>
-      <nav aria-label="Screens" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
-        {links.map((link) => (
-          <a key={link.route} href={`#/${link.route}`}>
-            {link.label}
-          </a>
-        ))}
-      </nav>
       {screenFor(route)}
     </main>
   )

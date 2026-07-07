@@ -7,6 +7,7 @@ import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
 import { tripRange } from '../domain/presence.ts'
 import type { Person } from '../domain/types.ts'
+import { todayISO } from '../today.ts'
 
 // ponytail: CSS grid, not a calendar lib
 
@@ -21,10 +22,6 @@ function isoOf(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
-}
-
-function todayIso(): string {
-  return isoOf(new Date())
 }
 
 // Inclusive list of yyyy-mm-dd from start to end, anchored at noon so adding a
@@ -60,7 +57,7 @@ export function WhosHere() {
 
   const range = tripRange(dated)
   const days = range ? eachDay(range.start, range.end) : []
-  const todayCol = days.indexOf(todayIso()) // -1 when today is outside the trip
+  const todayCol = days.indexOf(todayISO()) // -1 when today is outside the trip
   const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
 
   return (

@@ -6,18 +6,12 @@ import { useT } from '../i18n.ts'
 import { matches$, people$, tournaments$, useRows } from '../store.ts'
 import { standings } from '../domain/standings.ts'
 import type { Game, Match, Person, Tournament } from '../domain/types.ts'
+import { todayISO } from '../today.ts'
 
 type T = ReturnType<typeof useT>
 
 const GAMES: readonly Game[] = ['pingpong', 'chess', 'foosball']
 const gameEmoji: Record<Game, string> = { pingpong: '🏓', chess: '♟️', foosball: '⚽' }
-
-// Local yyyy-mm-dd (never drifts a day off UTC), matching Costs' convention.
-function today(): string {
-  const d = new Date()
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
-}
 
 const mono: CSSProperties = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }
 
@@ -175,7 +169,7 @@ function TournamentDetail({
   const log = () => {
     const id = crypto.randomUUID()
     const row: Match = {
-      id, tournament_id: tournament.id, winner_id: winnerId, loser_id: loserId, played_at: today(),
+      id, tournament_id: tournament.id, winner_id: winnerId, loser_id: loserId, played_at: todayISO(),
     }
     matches$[id].set(row)
     setWinnerId('')
