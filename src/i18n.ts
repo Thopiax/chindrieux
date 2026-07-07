@@ -23,6 +23,14 @@ export const dict = {
   'tournaments.title': { en: 'Tournaments', fr: 'Tournois', pt: 'Torneios', nl: 'Toernooien' },
   'oscars.title': { en: 'Oscars', fr: 'Les Oscars', pt: 'Oscars', nl: 'De Oscars' },
   'wifi.title': { en: 'Wifi', fr: 'Wifi', pt: 'Wi-Fi', nl: 'Wifi' },
+  'wifi.networkName': { en: 'Network name', fr: 'Nom du réseau', pt: 'Nome da rede', nl: 'Netwerknaam' },
+  'wifi.password': { en: 'Password', fr: 'Mot de passe', pt: 'Senha', nl: 'Wachtwoord' },
+  'wifi.networkPlaceholder': { en: 'e.g. Chalet-Guest', fr: 'ex. Chalet-Invite', pt: 'ex. Chale-Visitante', nl: 'bijv. Chalet-Gast' },
+  'wifi.passwordPlaceholder': { en: 'The wifi password', fr: 'Le mot de passe du wifi', pt: 'A senha do Wi-Fi', nl: 'Het wifi-wachtwoord' },
+  'wifi.tapToCopy': { en: 'Tap to copy', fr: 'Appuie pour copier', pt: 'Toque para copiar', nl: 'Tik om te kopiëren' },
+  'wifi.copied': { en: 'Copied!', fr: 'Copié !', pt: 'Copiado!', nl: 'Gekopieerd!' },
+  'wifi.scanToJoin': { en: 'Scan to hop on', fr: 'Scanne pour te connecter', pt: 'Escaneie para entrar', nl: 'Scan om te verbinden' },
+  'wifi.qrAlt': { en: 'Wifi join code', fr: 'QR code du wifi', pt: 'QR code do Wi-Fi', nl: 'Wifi-QR-code' },
 
   'screen.backToToday': { en: 'Back to today', fr: "Retour à aujourd'hui", pt: 'Voltar para hoje', nl: 'Terug naar vandaag' },
 
