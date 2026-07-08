@@ -10,10 +10,16 @@ export type Person = SyncFields & {
   arrival: string | null; departure: string | null
   blaze: boolean | null; drink: boolean | null; has_car: boolean | null
   world_cup_team: string | null; mode: number | null
+  // Optional (not `| null` on a required key) so pre-migration rows and the
+  // fallbackPerson literals stay valid. Absent/null means "eats meat".
+  eats_meat?: boolean | null
 }
 export type Expense = SyncFields & {
   id: string; payer_id: string; amount: number; label: string; date: string
   participant_ids: string[]; photo_url: string | null
+  // When set (and after `date`), the expense covers [date, end_date] and splits
+  // by days present in that range instead of evenly.
+  end_date?: string | null
 }
 export type Payment = SyncFields & { id: string; from_id: string; to_id: string; amount: number }
 export type Tournament = SyncFields & { id: string; name: string; game: Game }

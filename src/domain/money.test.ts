@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import type { Expense, Payment } from './types.ts'
-import { balances, shares, suggestTransfers } from './money.ts'
+import type { Expense, Payment, Person } from './types.ts'
+import { balances, expenseShares, shares, suggestTransfers, weightedShares } from './money.ts'
 
 function expense(
   id: string, payer_id: string, amount: number, participant_ids: string[],
@@ -35,6 +35,75 @@ describe('shares', () => {
   })
   test('no participants yields empty map', () => {
     expect(shares(1000, []).size).toBe(0)
+  })
+})
+
+function person(id: string, arrival: string | null, departure: string | null): Person {
+  return {
+    id, name: id, avatar_emoji: null, avatar_color: null, iban: null,
+    arrival, departure, blaze: null, drink: null, has_car: null,
+    world_cup_team: null, mode: null,
+  }
+}
+
+describe('weightedShares', () => {
+  test('splits proportionally and sums exactly', () => {
+    const s = weightedShares(9000, new Map([['a', 7], ['b', 2]]))
+    expect(s.get('a')).toBe(7000)
+    expect(s.get('b')).toBe(2000)
+  })
+  test('rounding remainder still sums exactly to total', () => {
+    const s = weightedShares(7000, new Map([['a', 7], ['b', 2]]))
+    expect([...s.values()].reduce((x, y) => x + y)).toBe(7000)
+  })
+  test('zero total weight yields empty map', () => {
+    expect(weightedShares(1000, new Map()).size).toBe(0)
+  })
+})
+
+describe('expenseShares', () => {
+  const week = { date: '2026-07-10', end_date: '2026-07-16' } // 7 days
+  const rangedExpense = (participant_ids: string[]): Expense => ({
+    id: 'car', payer_id: 'a', amount: 90, label: 'car', participant_ids,
+    photo_url: null, ...week,
+  })
+
+  test('by-days: full week vs two days', () => {
+    const people = [
+      person('a', '2026-07-10', '2026-07-16'), // 7 days
+      person('b', '2026-07-15', '2026-07-20'), // 2 days in range
+    ]
+    const s = expenseShares(rangedExpense(['a', 'b']), people)
+    expect(s.get('a')).toBe(7000)
+    expect(s.get('b')).toBe(2000)
+  })
+  test('no end_date falls back to even split', () => {
+    const e = { ...rangedExpense(['a', 'b']), end_date: null }
+    const s = expenseShares(e, [person('a', '2026-07-10', '2026-07-16'), person('b', '2026-07-15', '2026-07-16')])
+    expect(s.get('a')).toBe(4500)
+    expect(s.get('b')).toBe(4500)
+  })
+  test('ticked but zero overlap pays a one-day share', () => {
+    const people = [
+      person('a', '2026-07-10', '2026-07-16'), // 7 days
+      person('b', '2026-07-01', '2026-07-02'), // gone before it starts
+    ]
+    const s = expenseShares({ ...rangedExpense(['a', 'b']), amount: 80 }, people)
+    expect(s.get('a')).toBe(7000)
+    expect(s.get('b')).toBe(1000)
+  })
+  test('no stay dates counts as there the whole time', () => {
+    const people = [person('a', '2026-07-10', '2026-07-16'), person('b', null, null)]
+    const s = expenseShares({ ...rangedExpense(['a', 'b']), amount: 140 }, people)
+    expect(s.get('a')).toBe(7000)
+    expect(s.get('b')).toBe(7000)
+  })
+  test('balances stay zero-sum with ranged expenses', () => {
+    const people = [person('a', '2026-07-10', '2026-07-16'), person('b', '2026-07-15', '2026-07-20')]
+    const b = balances([rangedExpense(['a', 'b'])], [], people)
+    expect([...b.values()].reduce((x, y) => x + y, 0)).toBe(0)
+    expect(b.get('a')).toBe(2000) // paid 9000, owes 7000
+    expect(b.get('b')).toBe(-2000)
   })
 })
 

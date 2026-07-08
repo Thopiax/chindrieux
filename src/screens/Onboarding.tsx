@@ -22,6 +22,7 @@ type Form = {
   blaze: boolean
   drink: boolean
   hasCar: boolean
+  meat: boolean
   team: string
   mode: number
 }
@@ -35,6 +36,8 @@ const emptyForm: Form = {
   blaze: false,
   drink: false,
   hasCar: false,
+  // Opposite default from the other toggles: most people eat meat, vegetarians untick.
+  meat: true,
   team: '',
   mode: 50,
 }
@@ -50,6 +53,7 @@ const formFromPerson = (p: Person): Form => ({
   blaze: p.blaze ?? false,
   drink: p.drink ?? false,
   hasCar: p.has_car ?? false,
+  meat: p.eats_meat ?? true,
   team: p.world_cup_team ?? '',
   mode: p.mode ?? 50,
 })
@@ -160,6 +164,7 @@ export function Onboarding({
       blaze: form.blaze,
       drink: form.drink,
       has_car: form.hasCar,
+      eats_meat: form.meat,
       world_cup_team: form.team.trim() || null,
       mode: form.mode,
     }
@@ -257,7 +262,7 @@ function StepWho({
   const adding = mode === 'add'
   return (
     <div>
-      <h2>{adding ? t('profiles.addTitle') : t('onboarding.whoAreYou')}</h2>
+      {!adding && <h2>{t('onboarding.whoAreYou')}</h2>}
       {!adding && people.length > 0 && (
         <div
           style={{
@@ -307,7 +312,7 @@ function StepWho({
             type="text"
             value={name}
             onChange={(e) => onName(e.target.value)}
-            placeholder={t('onboarding.namePlaceholder')}
+            placeholder={adding ? undefined : t('onboarding.namePlaceholder')}
             style={{
               flex: 1,
               minWidth: 160,
@@ -469,9 +474,10 @@ function StepVibes({
   onBack: () => void
   onSave: () => void
 }) {
-  const toggles: { key: 'blaze' | 'drink' | 'hasCar'; label: string }[] = [
+  const toggles: { key: 'blaze' | 'drink' | 'hasCar' | 'meat'; label: string }[] = [
     { key: 'blaze', label: `🌿 ${t('onboarding.vibes.blaze')}` },
     { key: 'drink', label: `🍷 ${t('onboarding.vibes.drink')}` },
+    { key: 'meat', label: `🥩 ${t('onboarding.vibes.meat')}` },
     { key: 'hasCar', label: `🚗 ${t('onboarding.vibes.hasCar')}` },
   ]
   const dateInput = {
