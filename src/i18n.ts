@@ -93,7 +93,7 @@ export const dict = {
   'onboarding.vibes.hasCar': { en: 'Bringing wheels?', fr: 'Tu ramènes une caisse ?', pt: 'Vem de carro (é o motora)?', nl: 'Neem je wielen mee?' },
   'onboarding.vibes.meat': { en: 'Meat on your plate?', fr: "De la viande dans l'assiette ?", pt: 'Carne no prato?', nl: 'Vlees op je bord?' },
   'onboarding.vibes.worldCupTeam': { en: 'Screaming for who at the World Cup?', fr: 'Tu cries pour qui à la Coupe du Monde ?', pt: 'Torcendo pra quem na Copa?', nl: 'Voor wie schreeuw je bij het WK?' },
-  'onboarding.vibes.teamPlaceholder': { en: 'e.g. Brazil (correct answer)', fr: 'ex. le Brésil (bonne réponse)', pt: 'ex. Brasil (resposta certa)', nl: 'bijv. Brazilië (juiste antwoord)' },
+  'onboarding.vibes.teamPlaceholder': { en: 'e.g. Cabo Verde', fr: 'ex. le Cap-Vert', pt: 'ex. Cabo Verde', nl: 'bijv. Kaapverdië' },
   'onboarding.vibes.workChill': { en: 'Laptop or hammock?', fr: 'Ordi ou transat ?', pt: 'Notebook ou rede?', nl: 'Laptop of hangmat?' },
 
   'langSwitcher.label': { en: 'Language', fr: 'Langue', pt: 'Idioma', nl: 'Taal' },
@@ -117,6 +117,9 @@ export const dict = {
   'costs.uploading': { en: 'Uploading...', fr: 'Envoi...', pt: 'Enviando...', nl: 'Uploaden...' },
   'costs.tapAgain': { en: 'Tap again to delete', fr: 'Appuie encore pour supprimer', pt: 'Toque de novo pra excluir', nl: 'Tik nog eens om te verwijderen' },
   'costs.settleUp': { en: 'Settle up', fr: 'On se rembourse', pt: 'Acertar as contas', nl: 'Afrekenen' },
+  'costs.youOwe': { en: 'You owe {amount}', fr: 'Tu dois {amount}', pt: 'Você deve {amount}', nl: 'Je moet {amount} betalen' },
+  'costs.youAreOwed': { en: "You're owed {amount}", fr: 'On te doit {amount}', pt: 'Estão te devendo {amount}', nl: 'Je krijgt nog {amount}' },
+  'costs.yourShare': { en: 'Your share: {amount}', fr: 'Ta part : {amount}', pt: 'Sua parte: {amount}', nl: 'Jouw deel: {amount}' },
   'costs.allSquare': { en: 'All square! Nobody owes anything.', fr: 'Tout est réglé ! Personne ne doit rien.', pt: 'Tudo quitado! Ninguém deve nada.', nl: 'Alles gelijk! Niemand is iets schuldig.' },
   'costs.markPaid': { en: 'Mark paid', fr: 'Marquer payé', pt: 'Marcar como pago', nl: 'Markeer als betaald' },
   'costs.ibanPrompt': { en: 'Add your IBAN so friends can pay you', fr: 'Ajoute ton IBAN pour que les copains te remboursent', pt: 'Adicione seu IBAN pra galera te pagar', nl: 'Voeg je IBAN toe zodat vrienden je kunnen betalen' },

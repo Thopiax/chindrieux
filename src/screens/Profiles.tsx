@@ -64,17 +64,10 @@ export function Profiles() {
 
   return (
     <Screen title={t('profiles.title')}>
-      <button type="button" className="big-red" onClick={() => setPanel({ mode: 'add' })}>
-        {t('profiles.addPerson')}
-      </button>
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 20px' }}>
-        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
-          {t('profiles.addMany')}
-        </button>
-      </div>
-      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
-
       <CrewPulse t={t} people={people} />
+
+      <h2 className="marker-underline">{t('whoshere.title')}</h2>
+      <WhosHereSection />
 
       {sorted.length === 0 ? (
         <p style={{ marginBottom: 20 }}>{t('profiles.empty')}</p>
@@ -133,8 +126,15 @@ export function Profiles() {
         />
       )}
 
-      <h2 className="marker-underline">{t('whoshere.title')}</h2>
-      <WhosHereSection />
+      <button type="button" className="big-red" onClick={() => setPanel({ mode: 'add' })}>
+        {t('profiles.addPerson')}
+      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 20px' }}>
+        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
+          {t('profiles.addMany')}
+        </button>
+      </div>
+      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
     </Screen>
   )
 }

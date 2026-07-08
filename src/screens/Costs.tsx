@@ -7,7 +7,7 @@ import { PersonPicker } from '../components/PersonPicker.tsx'
 import { useT } from '../i18n.ts'
 import { myId$ } from '../identity.ts'
 import { expenses$, payments$, people$, useRows } from '../store.ts'
-import { balances, suggestTransfers } from '../domain/money.ts'
+import { balances, expenseShares, suggestTransfers } from '../domain/money.ts'
 import { presentInRange } from '../domain/presence.ts'
 import type { Expense, Payment, Person } from '../domain/types.ts'
 import { uploadPhoto } from '../photos.ts'
@@ -117,10 +117,12 @@ export function Costs() {
 
   return (
     <Screen title={t('costs.title')}>
+      <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
+
       <button
         type="button"
         className="big-red"
-        style={{ marginBottom: 24 }}
+        style={{ margin: '24px 0' }}
         onClick={() => setForm({ mode: 'add' })}
       >
         {t('costs.addExpense')}
@@ -139,6 +141,15 @@ export function Costs() {
                     <Badge person={byId.get(e.payer_id) ?? fallbackPerson(nameOf(e.payer_id))} size="sm" />
                     <span style={{ ...mono, fontWeight: 700, fontSize: 18 }}>{fmtEur(e.amount)}</span>
                   </div>
+                  {(() => {
+                    // The "why" behind the settle-up number: my slice of this expense.
+                    const myShare = expenseShares(e, people).get(myId)
+                    return myShare ? (
+                      <p style={{ fontSize: 13, fontWeight: 700, opacity: 0.65, margin: '0 0 8px' }}>
+                        {t('costs.yourShare', { amount: fmtCents(myShare) })}
+                      </p>
+                    ) : null
+                  })()}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {e.participant_ids.map((id) => (
                       <Badge key={id} person={byId.get(id) ?? fallbackPerson(nameOf(id))} size="sm" />
@@ -176,8 +187,6 @@ export function Costs() {
           ))
         )}
       </div>
-
-      <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
     </Screen>
   )
 }
@@ -203,7 +212,10 @@ function SettleUp({
   const [iban, setIban] = useState('')
   const [pendingUndo, setPendingUndo] = useState<string | null>(null)
   const b = balances(expenses, payments, people)
-  const transfers = suggestTransfers(b)
+  // My transfers first: what I owe, then what I'm owed, then everyone else's.
+  const involvesMe = (tr: { from: string; to: string }) =>
+    tr.from === myId ? 2 : tr.to === myId ? 1 : 0
+  const transfers = suggestTransfers(b).sort((a, z) => involvesMe(z) - involvesMe(a))
   const myBalance = b.get(myId) ?? 0
   const me = byId.get(myId)
   const settled = payments
@@ -211,6 +223,19 @@ function SettleUp({
   return (
     <section>
       <h2 className="marker-underline" style={{ marginBottom: 12 }}>{t('costs.settleUp')}</h2>
+
+      {myBalance !== 0 && (
+        <p
+          style={{
+            fontSize: 22, fontWeight: 700, margin: '0 0 12px',
+            color: myBalance < 0 ? 'var(--color-tomato-text)' : 'var(--color-ink)',
+          }}
+        >
+          {myBalance < 0
+            ? t('costs.youOwe', { amount: fmtCents(-myBalance) })
+            : t('costs.youAreOwed', { amount: fmtCents(myBalance) })}
+        </p>
+      )}
 
       {myBalance > 0 && me && !me.iban && (
         <Card style={{ marginBottom: 16 }}>
