@@ -140,17 +140,16 @@ export function Costs() {
 
   return (
     <Screen title={t('costs.title')}>
-      <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
-
       <button
         type="button"
         className="big-red"
-        style={{ margin: '24px 0' }}
+        style={{ margin: '0 0 24px' }}
         onClick={() => setForm({ mode: 'add' })}
       >
         {t('costs.addExpense')}
       </button>
 
+      <h2 className="marker-underline" style={{ marginBottom: 12 }}>{t('costs.expenses')}</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
         {expenses.length === 0 ? (
           <p>{t('costs.empty')}</p>
@@ -223,6 +222,8 @@ export function Costs() {
           ))
         )}
       </div>
+
+      <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
     </Screen>
   )
 }

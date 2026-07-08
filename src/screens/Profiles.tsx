@@ -63,9 +63,6 @@ export function Profiles() {
 
   return (
     <Screen title={t('profiles.title')}>
-      <h2 className="marker-underline" style={{ marginTop: 0 }}>{t('whoshere.title')}</h2>
-      <WhosHereSection />
-
       <CrewPulse t={t} people={people} />
 
       {sorted.length === 0 ? (
@@ -130,6 +127,9 @@ export function Profiles() {
         </button>
       </div>
       {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
+
+      <h2 className="marker-underline" style={{ margin: '24px 0 12px' }}>{t('whoshere.title')}</h2>
+      <WhosHereSection />
     </Screen>
   )
 }
