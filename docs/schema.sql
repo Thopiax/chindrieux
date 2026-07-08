@@ -29,6 +29,10 @@ create table expenses (
   amount numeric(8,2) not null,
   label text not null,
   date date not null,
+  -- covers [date, end_date] and splits by days present when set
+  end_date date,
+  -- amount is a per-person-per-day rate instead of a fixed total
+  per_head boolean not null default false,
   participant_ids uuid[] not null,
   photo_url text,
   created_at timestamptz not null default now(),

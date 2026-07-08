@@ -57,5 +57,6 @@ export const useRows = <T extends { deleted?: boolean }>(
 ): T[] =>
   useSelector(() => {
     const rows = (obs.get() ?? {}) as Record<string, T>
-    return Object.values(rows).filter((r) => !r.deleted)
+    // r can be briefly undefined while a sync merge is in flight.
+    return Object.values(rows).filter((r) => r && !r.deleted)
   })

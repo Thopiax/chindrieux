@@ -1,13 +1,13 @@
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { use$ } from '@legendapp/state/react'
 import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { Screen } from '../components/Screen.tsx'
 import { PersonPicker } from '../components/PersonPicker.tsx'
-import { useT } from '../i18n.ts'
+import { lang$, useT, type Lang } from '../i18n.ts'
 import { myId$ } from '../identity.ts'
 import { expenses$, payments$, people$, useRows } from '../store.ts'
-import { balances, expenseShares, suggestTransfers } from '../domain/money.ts'
+import { balances, expenseShares, expenseTotal, suggestTransfers } from '../domain/money.ts'
 import { presentInRange } from '../domain/presence.ts'
 import type { Expense, Payment, Person } from '../domain/types.ts'
 import { uploadPhoto } from '../photos.ts'
@@ -27,6 +27,23 @@ function fmtCents(cents: number): string {
 }
 
 const mono: CSSProperties = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }
+const hint: CSSProperties = { fontSize: 13, fontWeight: 700, opacity: 0.65 }
+
+// yyyy-mm-dd anchored at local noon so toLocaleDateString never drifts a day.
+function fmtDate(iso: string, lang: Lang): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString(lang, { day: 'numeric', month: 'short' })
+}
+
+// Two-tap confirm state (delete / undo) that disarms itself after a beat.
+function useArmed(): [string | null, (id: string | null) => void] {
+  const [armed, setArmed] = useState<string | null>(null)
+  useEffect(() => {
+    if (armed === null) return
+    const id = setTimeout(() => setArmed(null), 4000)
+    return () => clearTimeout(id)
+  }, [armed])
+  return [armed, setArmed]
+}
 
 const primaryBtn: CSSProperties = {
   fontFamily: 'inherit', fontWeight: 700, fontSize: 15, color: '#fff',
@@ -78,9 +95,15 @@ function overridesFromExpense(people: Person[], e: Expense): Record<string, bool
 
 export function Costs() {
   const t = useT()
+  const lang = use$(lang$)
   const myId = use$(myId$) as string
   const people = useRows(people$)
-  const expenses = useRows(expenses$)
+  // Newest first: by date, then by creation time. useRows returns a fresh
+  // array each render, so sorting in place is fine. Fields are guarded because
+  // a partially synced row can surface with them briefly undefined.
+  const expenses = useRows(expenses$).sort(
+    (a, z) => (z.date ?? '').localeCompare(a.date ?? '') || (z.created_at ?? '').localeCompare(a.created_at ?? ''),
+  )
   const payments = useRows(payments$)
 
   // Closed, adding, or editing a specific expense. The form remounts fresh each
@@ -89,7 +112,7 @@ export function Costs() {
   const [form, setForm] = useState<{ mode: 'add' } | { mode: 'edit'; expense: Expense } | null>(
     () => (routeQuery().has('new') ? { mode: 'add' } : null),
   )
-  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useArmed()
 
   // Drop the '?new' marker once the form closes so a reload stays closed.
   const closeForm = () => {
@@ -136,22 +159,33 @@ export function Costs() {
             <Card key={e.id}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                 <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: 18, display: 'block', marginBottom: 8 }}>{e.label}</strong>
+                  <strong style={{ fontSize: 18, display: 'block', marginBottom: 2 }}>{e.label}</strong>
+                  {e.date && (
+                    <p style={{ ...hint, margin: '0 0 8px' }}>
+                      {fmtDate(e.date, lang)}
+                      {e.end_date && e.end_date > e.date ? ` → ${fmtDate(e.end_date, lang)}` : ''}
+                    </p>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <Badge person={byId.get(e.payer_id) ?? fallbackPerson(nameOf(e.payer_id))} size="sm" />
-                    <span style={{ ...mono, fontWeight: 700, fontSize: 18 }}>{fmtEur(e.amount)}</span>
+                    <span style={{ ...mono, fontWeight: 700, fontSize: 18 }}>{fmtCents(expenseTotal(e, people))}</span>
                   </div>
+                  {e.per_head && (
+                    <p style={{ ...hint, margin: '0 0 8px' }}>
+                      {t('costs.perHeadNote', { rate: fmtEur(e.amount) })}
+                    </p>
+                  )}
                   {(() => {
                     // The "why" behind the settle-up number: my slice of this expense.
                     const myShare = expenseShares(e, people).get(myId)
                     return myShare ? (
-                      <p style={{ fontSize: 13, fontWeight: 700, opacity: 0.65, margin: '0 0 8px' }}>
+                      <p style={{ ...hint, margin: '0 0 8px' }}>
                         {t('costs.yourShare', { amount: fmtCents(myShare) })}
                       </p>
                     ) : null
                   })()}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {e.participant_ids.map((id) => (
+                    {(e.participant_ids ?? []).map((id) => (
                       <Badge key={id} person={byId.get(id) ?? fallbackPerson(nameOf(id))} size="sm" />
                     ))}
                   </div>
@@ -160,6 +194,7 @@ export function Costs() {
                   <img
                     src={e.photo_url}
                     alt={e.label}
+                    loading="lazy"
                     style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--color-ink)' }}
                   />
                 )}
@@ -210,8 +245,13 @@ function SettleUp({
   people: Person[]
 }) {
   const [iban, setIban] = useState('')
-  const [pendingUndo, setPendingUndo] = useState<string | null>(null)
+  const [pendingUndo, setPendingUndo] = useArmed()
   const b = balances(expenses, payments, people)
+  let totalAll = 0, myTotal = 0
+  for (const e of expenses) {
+    totalAll += expenseTotal(e, people)
+    myTotal += expenseShares(e, people).get(myId) ?? 0
+  }
   // My transfers first: what I owe, then what I'm owed, then everyone else's.
   const involvesMe = (tr: { from: string; to: string }) =>
     tr.from === myId ? 2 : tr.to === myId ? 1 : 0
@@ -237,6 +277,12 @@ function SettleUp({
         </p>
       )}
 
+      {totalAll > 0 && (
+        <p style={{ ...hint, margin: '0 0 12px' }}>
+          {t('costs.totalSoFar', { total: fmtCents(totalAll), mine: fmtCents(myTotal) })}
+        </p>
+      )}
+
       {myBalance > 0 && me && !me.iban && (
         <Card style={{ marginBottom: 16 }}>
           <p style={{ ...fieldLabel, marginBottom: 8 }}>{t('costs.ibanPrompt')}</p>
@@ -246,6 +292,8 @@ function SettleUp({
               value={iban}
               onChange={(e) => setIban(e.target.value)}
               placeholder={t('costs.ibanPlaceholder')}
+              spellCheck={false}
+              autoComplete="off"
               style={{ ...inputStyle, flex: 1, minWidth: 160, width: 'auto' }}
             />
             <button
@@ -276,9 +324,7 @@ function SettleUp({
                     {fmtCents(tr.amount)}
                   </span>
                 </div>
-                {payee?.iban && (
-                  <p style={{ ...mono, fontSize: 13, margin: '8px 0 0', wordBreak: 'break-all' }}>{payee.iban}</p>
-                )}
+                {payee?.iban && <CopyIban t={t} iban={payee.iban} />}
                 <button
                   type="button"
                   style={{ ...primaryBtn, marginTop: 10 }}
@@ -299,11 +345,12 @@ function SettleUp({
         <ul style={{ listStyle: 'none', padding: 0, margin: '16px 0 0', display: 'flex', flexDirection: 'column', gap: 4 }}>
           {settled.map((p) => {
             const armed = pendingUndo === p.id
+            const line = t('costs.settled', { from: nameOf(p.from_id), to: nameOf(p.to_id), amount: fmtEur(p.amount) })
             return (
               <li key={p.id}>
                 <button
                   type="button"
-                  aria-label={t('costs.undoPayment')}
+                  aria-label={`${line}. ${t('costs.undoPayment')}`}
                   onClick={() => {
                     if (armed) {
                       payments$[p.id].deleted.set(true)
@@ -319,9 +366,7 @@ function SettleUp({
                     fontWeight: armed ? 700 : 400, opacity: armed ? 1 : 0.7,
                   }}
                 >
-                  {armed
-                    ? t('costs.tapToUndo')
-                    : `${t('costs.settled', { from: nameOf(p.from_id), to: nameOf(p.to_id), amount: fmtEur(p.amount) })} ✓`}
+                  {armed ? t('costs.tapToUndo') : `${line} ✓`}
                 </button>
               </li>
             )
@@ -329,6 +374,35 @@ function SettleUp({
         </ul>
       )}
     </section>
+  )
+}
+
+// The payee's IBAN as a tap-to-copy button, so it can go straight into a
+// banking app instead of being finger-selected out of a mono string.
+function CopyIban({ t, iban }: { t: T; iban: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(iban.replaceAll(' ', ''))
+        } catch {
+          return
+        }
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      }}
+      style={{
+        fontFamily: 'inherit', textAlign: 'left', width: '100%', cursor: 'pointer',
+        background: 'none', border: 'none', padding: '8px 0 0', minHeight: 44,
+      }}
+    >
+      <span style={{ ...mono, fontSize: 13, wordBreak: 'break-all', display: 'block' }}>{iban}</span>
+      <span style={{ ...hint, color: copied ? 'var(--color-grass)' : 'var(--color-cerulean)', opacity: 1 }}>
+        {copied ? t('costs.copied') : t('costs.copyIban')}
+      </span>
+    </button>
   )
 }
 
@@ -343,6 +417,7 @@ function ExpenseForm({
 }) {
   const [label, setLabel] = useState(initial?.label ?? '')
   const [amount, setAmount] = useState(initial ? String(initial.amount) : '')
+  const [perHead, setPerHead] = useState(initial?.per_head ?? false)
   const [date, setDate] = useState(initial?.date ?? todayISO())
   const [endDate, setEndDate] = useState(initial?.end_date ?? '')
   const [payerId, setPayerId] = useState(initial?.payer_id ?? myId)
@@ -372,6 +447,7 @@ function ExpenseForm({
       participant_ids: [...checked],
       photo_url: photoUrl,
       end_date: ranged ? endDate : null,
+      per_head: perHead,
     }
     expenses$[id].set(row)
     onClose()
@@ -401,6 +477,16 @@ function ExpenseForm({
           <span style={fieldLabel}>{t('costs.amount')}</span>
           <input type="number" step="0.01" min="0" inputMode="decimal" value={amount}
             onChange={(e) => setAmount(e.target.value)} style={{ ...inputStyle, ...mono }} />
+        </label>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, minHeight: 44 }}>
+          <input
+            type="checkbox"
+            checked={perHead}
+            onChange={(e) => setPerHead(e.target.checked)}
+            style={{ width: 20, height: 20 }}
+          />
+          {t('costs.perHead')}
         </label>
 
         <label>

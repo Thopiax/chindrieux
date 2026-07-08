@@ -113,6 +113,11 @@ export const dict = {
   'costs.settled': { en: '{from} paid {to} {amount}', fr: '{from} a payé {amount} à {to}', pt: '{from} pagou {amount} pra {to}', nl: '{from} betaalde {amount} aan {to}' },
   'costs.undoPayment': { en: 'Undo this payment', fr: 'Annuler ce paiement', pt: 'Desfazer este pagamento', nl: 'Deze betaling ongedaan maken' },
   'costs.tapToUndo': { en: 'Tap again to undo', fr: 'Appuie encore pour annuler', pt: 'Toque de novo pra desfazer', nl: 'Tik nog eens om ongedaan te maken' },
+  'costs.totalSoFar': { en: 'Total so far: {total} · your part: {mine}', fr: 'Total pour le moment : {total} · ta part : {mine}', pt: 'Total até agora: {total} · sua parte: {mine}', nl: 'Totaal tot nu toe: {total} · jouw deel: {mine}' },
+  'costs.perHead': { en: 'Per person per day', fr: 'Par personne et par jour', pt: 'Por pessoa por dia', nl: 'Per persoon per dag' },
+  'costs.perHeadNote': { en: '{rate} per person per day', fr: '{rate} par personne et par jour', pt: '{rate} por pessoa por dia', nl: '{rate} per persoon per dag' },
+  'costs.copyIban': { en: 'Copy IBAN', fr: "Copier l'IBAN", pt: 'Copiar IBAN', nl: 'IBAN kopiëren' },
+  'costs.copied': { en: 'Copied ✓', fr: 'Copié ✓', pt: 'Copiado ✓', nl: 'Gekopieerd ✓' },
 
   'tournaments.empty': { en: 'No tournaments yet. Start one!', fr: 'Pas encore de tournoi. Lance le premier !', pt: 'Nenhum torneio ainda. Comece um!', nl: 'Nog geen toernooien. Begin er een!' },
   'tournaments.newTournament': { en: '+ New tournament', fr: '+ Nouveau tournoi', pt: '+ Novo torneio', nl: '+ Nieuw toernooi' },

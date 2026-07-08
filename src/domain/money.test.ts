@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { Expense, Payment, Person } from './types.ts'
-import { balances, expenseShares, shares, suggestTransfers, weightedShares } from './money.ts'
+import { balances, expenseShares, expenseTotal, shares, suggestTransfers, weightedShares } from './money.ts'
 
 function expense(
   id: string, payer_id: string, amount: number, participant_ids: string[],
@@ -104,6 +104,50 @@ describe('expenseShares', () => {
     expect([...b.values()].reduce((x, y) => x + y, 0)).toBe(0)
     expect(b.get('a')).toBe(2000) // paid 9000, owes 7000
     expect(b.get('b')).toBe(-2000)
+  })
+})
+
+describe('per_head expenses', () => {
+  const week = { date: '2026-07-10', end_date: '2026-07-16' } // 7 days
+  // €5 per person per day car chip-in, collected by 'a'
+  const chipIn = (participant_ids: string[]): Expense => ({
+    id: 'car', payer_id: 'a', amount: 5, label: 'car', participant_ids,
+    photo_url: null, per_head: true, ...week,
+  })
+
+  test('each participant owes rate × their days', () => {
+    const people = [
+      person('b', '2026-07-10', '2026-07-16'), // 7 days
+      person('c', '2026-07-15', '2026-07-20'), // 2 days in range
+    ]
+    const s = expenseShares(chipIn(['b', 'c']), people)
+    expect(s.get('b')).toBe(3500)
+    expect(s.get('c')).toBe(1000)
+  })
+  test('total is the sum of contributions, and balances stay zero-sum', () => {
+    const people = [
+      person('a', '2026-07-10', '2026-07-16'),
+      person('b', '2026-07-10', '2026-07-16'),
+      person('c', '2026-07-15', '2026-07-20'),
+    ]
+    const e = chipIn(['b', 'c'])
+    expect(expenseTotal(e, people)).toBe(4500)
+    const b = balances([e], [], people)
+    expect([...b.values()].reduce((x, y) => x + y, 0)).toBe(0)
+    expect(b.get('a')).toBe(4500) // collects, contributes nothing
+  })
+  test('single-date per_head charges one day each', () => {
+    const e = { ...chipIn(['b', 'c']), end_date: null }
+    const s = expenseShares(e, [])
+    expect(s.get('b')).toBe(500)
+    expect(s.get('c')).toBe(500)
+  })
+  test('ticked but zero overlap still owes one day', () => {
+    const people = [person('b', '2026-07-01', '2026-07-02')] // gone before it starts
+    expect(expenseShares(chipIn(['b']), people).get('b')).toBe(500)
+  })
+  test('expenseTotal of a normal expense is just the amount', () => {
+    expect(expenseTotal(expense('e', 'a', 12.34, ['a', 'b']), [])).toBe(1234)
   })
 })
 

@@ -22,6 +22,10 @@ export type Expense = SyncFields & {
   // When set (and after `date`), the expense covers [date, end_date] and splits
   // by days present in that range instead of evenly.
   end_date?: string | null
+  // When true, `amount` is a per-person-per-day rate (e.g. €5 car chip-in):
+  // each participant owes amount × their days in the covered range (min 1)
+  // and the payer collects the sum instead of a fixed total.
+  per_head?: boolean | null
 }
 export type Payment = SyncFields & { id: string; from_id: string; to_id: string; amount: number }
 export type Tournament = SyncFields & { id: string; name: string; game: Game }
