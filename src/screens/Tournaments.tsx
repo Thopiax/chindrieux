@@ -22,7 +22,7 @@ const primaryBtn: CSSProperties = {
 }
 const ghostBtn: CSSProperties = {
   fontFamily: 'inherit', fontWeight: 700, fontSize: 14, color: 'var(--color-ink)',
-  background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+  background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', minHeight: 44,
 }
 const inputStyle: CSSProperties = {
   fontFamily: 'inherit', fontSize: 16, padding: '10px 12px', borderRadius: 8,
@@ -251,7 +251,7 @@ function TournamentDetail({
             </label>
 
             {bothPicked && winnerId === loserId && (
-              <p style={{ color: 'var(--color-tomato)', fontWeight: 700, margin: 0 }}>
+              <p style={{ color: 'var(--color-tomato-text)', fontWeight: 700, margin: 0 }}>
                 {t('tournaments.mustDiffer')}
               </p>
             )}
@@ -279,7 +279,7 @@ function TournamentDetail({
                 <span style={{ fontWeight: 700 }}>{nameOf(m.loser_id)}</span>
                 <button
                   type="button"
-                  style={{ ...ghostBtn, color: 'var(--color-tomato)', marginLeft: 'auto' }}
+                  style={{ ...ghostBtn, color: 'var(--color-tomato-text)', marginLeft: 'auto' }}
                   onClick={() => {
                     if (pendingDelete === m.id) {
                       matches$[m.id].deleted.set(true)

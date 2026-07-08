@@ -2,6 +2,8 @@
 @theme {
   --color-cerulean: #4FA3D1; --color-sunny: #FFD23F; --color-tomato: #FF6B4A;
   --color-grass: #7BC950; --color-paper: #FBF6E9; --color-ink: #2B2B2B;
+  /* Darkened tomato for error/destructive TEXT: passes WCAG AA 4.5:1 on white (5.21) and paper (4.82). Keep --color-tomato for fills/decoration. */
+  --color-tomato-text: #C43D1F;
   --font-display: "Grandstander", cursive;
   --font-body: "Nunito", system-ui, sans-serif;
 }

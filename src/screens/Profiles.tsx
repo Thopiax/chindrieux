@@ -39,7 +39,8 @@ const ghostBtn = {
   background: 'none',
   border: 'none',
   cursor: 'pointer',
-  padding: 4,
+  padding: '10px 12px',
+  minHeight: 44,
 } as const
 
 export function Profiles() {

@@ -26,7 +26,7 @@ const primaryBtn: CSSProperties = {
 }
 const ghostBtn: CSSProperties = {
   fontFamily: 'inherit', fontWeight: 700, fontSize: 14, color: 'var(--color-ink)',
-  background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+  background: 'none', border: 'none', cursor: 'pointer', padding: '10px 12px', minHeight: 44,
 }
 const inputStyle: CSSProperties = {
   fontFamily: 'inherit', fontSize: 16, padding: '10px 12px', borderRadius: 8,
@@ -138,7 +138,7 @@ function Proposing({
                 <strong style={{ fontSize: 20, flex: 1 }}>{c.name}</strong>
                 <button
                   type="button"
-                  style={{ ...ghostBtn, color: 'var(--color-tomato)' }}
+                  style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
                   onClick={() => {
                     if (pendingDelete === c.id) {
                       oscarCategories$[c.id].deleted.set(true)
@@ -199,7 +199,7 @@ function NominationList({
           <Badge person={personOf(n.proposed_by)} size="sm" />
           <button
             type="button"
-            style={{ ...ghostBtn, color: 'var(--color-tomato)' }}
+            style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
             onClick={() => {
               if (pendingDelete === n.id) {
                 nominations$[n.id].deleted.set(true)
@@ -279,7 +279,7 @@ function NominationForm({ t, categoryId, myId }: { t: T; categoryId: string; myI
         />
         {uploading && <p style={{ fontSize: 13 }}>{t('oscars.uploading')}</p>}
         {uploadFailed && !uploading && (
-          <p style={{ fontSize: 13, color: 'var(--color-tomato)', fontWeight: 700 }}>{t('common.uploadFailed')}</p>
+          <p style={{ fontSize: 13, color: 'var(--color-tomato-text)', fontWeight: 700 }}>{t('common.uploadFailed')}</p>
         )}
         {photoUrl && !uploading && (
           <img src={photoUrl} alt="" style={{ marginTop: 8, width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--color-ink)' }} />
