@@ -14,6 +14,14 @@ import { todayISO } from '../today.ts'
 const BAR_FALLBACK = '#C9C4B5'
 const DAY_COL_PX = 44
 const NAME_COL_PX = 80
+const BLEED_PX = 20 // must match <main>'s side padding in App.tsx
+
+// ponytail: hardcoded summer-2026 event dates; edit for the next trip
+const MARKERS: Record<string, { emoji: string; key: string }> = {
+  '2026-07-14': { emoji: '🇫🇷⚽', key: 'whoshere.marker14juillet' },
+  '2026-07-15': { emoji: '⚽', key: 'whoshere.markerSemi' },
+  '2026-07-19': { emoji: '🏆', key: 'whoshere.markerFinal' },
+}
 
 function weekdayNarrow(iso: string, lang: Lang): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString(lang, { weekday: 'narrow' })
@@ -38,11 +46,20 @@ export function WhosHereSection() {
   const days = range ? eachDay(range.start, range.end) : []
   const todayCol = days.indexOf(todayISO()) // -1 when today is outside the trip
   const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
+  const markerDays = days.filter((d) => MARKERS[d])
 
   return (
     <section>
       {days.length > 0 && dated.length > 0 ? (
-        <div style={{ overflowX: 'auto', marginBottom: 24, paddingBottom: 4 }}>
+        <>
+        {/* Full bleed: cancel the page's side padding so the chart scrolls edge to edge. */}
+        <div
+          style={{
+            overflowX: 'auto',
+            margin: `0 -${BLEED_PX}px ${markerDays.length > 0 ? 8 : 24}px`,
+            padding: `0 ${BLEED_PX}px 4px`,
+          }}
+        >
           <div
             style={{
               display: 'grid',
@@ -71,6 +88,25 @@ export function WhosHereSection() {
               />
             )}
 
+            {/* Event days get a dashed cerulean outline down the whole column. */}
+            {days.map((d, i) =>
+              MARKERS[d] ? (
+                <div
+                  key={`marker-${d}`}
+                  aria-hidden
+                  style={{
+                    gridColumn: 2 + i,
+                    gridRow: `1 / ${lastRow + 1}`,
+                    alignSelf: 'stretch',
+                    border: '2px dashed rgb(79 163 209 / .55)',
+                    borderRadius: 8,
+                    pointerEvents: 'none',
+                    zIndex: 5,
+                  }}
+                />
+              ) : null,
+            )}
+
             {/* Header row: corner + one cell per day. */}
             <div style={cornerCell} />
             {days.map((d, i) => (
@@ -79,6 +115,9 @@ export function WhosHereSection() {
                   {weekdayNarrow(d, lang)}
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>{dayNumber(d)}</div>
+                {MARKERS[d] && (
+                  <div style={{ fontSize: 11, lineHeight: 1.3 }}>{MARKERS[d].emoji}</div>
+                )}
               </div>
             ))}
 
@@ -124,6 +163,12 @@ export function WhosHereSection() {
             })}
           </div>
         </div>
+        {markerDays.length > 0 && (
+          <p style={{ margin: '0 0 24px', fontSize: 12, fontWeight: 700, opacity: 0.75 }}>
+            {markerDays.map((d) => `${MARKERS[d].emoji} ${t(MARKERS[d].key)}`).join(' · ')}
+          </p>
+        )}
+        </>
       ) : (
         <p style={{ marginBottom: 24 }}>{t('whoshere.empty')}</p>
       )}

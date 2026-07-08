@@ -42,6 +42,9 @@ export const dict = {
   'whoshere.empty': { en: 'No dates on the calendar yet', fr: 'Pas encore de dates au calendrier', pt: 'Nenhuma data no calendário ainda', nl: 'Nog geen data op de kalender' },
   'whoshere.needDatesTitle': { en: 'Still need to pick dates', fr: 'Il manque encore des dates', pt: 'Ainda faltam datas', nl: 'Nog datums nodig' },
   'whoshere.setYourDates': { en: 'Set your dates', fr: 'Choisis tes dates', pt: 'Escolha suas datas', nl: 'Kies je datums' },
+  'whoshere.marker14juillet': { en: '14 juillet + World Cup semi-final', fr: '14 juillet + demi-finale de la Coupe du monde', pt: '14 de julho + semifinal da Copa', nl: 'Quatorze juillet + WK halve finale' },
+  'whoshere.markerSemi': { en: 'World Cup semi-final', fr: 'Demi-finale de la Coupe du monde', pt: 'Semifinal da Copa', nl: 'WK halve finale' },
+  'whoshere.markerFinal': { en: 'World Cup final', fr: 'Finale de la Coupe du monde', pt: 'Final da Copa', nl: 'WK finale' },
 
   'profiles.addPerson': { en: '+ Add person', fr: "+ Ajouter quelqu'un", pt: '+ Adicionar pessoa', nl: '+ Iemand toevoegen' },
   'profiles.addMany': { en: '+ Add a bunch', fr: '+ Ajouter plusieurs', pt: '+ Adicionar vários', nl: '+ Meerdere toevoegen' },
