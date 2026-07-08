@@ -19,7 +19,8 @@ const DEFAULT_COLOR = '#C9C4B5'
 export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Size }) {
   const { box, font } = dims[size]
   const color = person.avatar_color ?? DEFAULT_COLOR
-  const letter = person.name.trim().slice(0, 1).toUpperCase() || '?'
+  // Guarded: a partially-synced row can render for a frame with name undefined.
+  const letter = (person.name ?? '').trim().slice(0, 1).toUpperCase() || '?'
   return (
     <span
       role="img"

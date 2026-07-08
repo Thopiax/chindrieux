@@ -59,7 +59,7 @@ export function Profiles() {
 
   if (panel) return <Onboarding mode={panel.mode} personId={panel.personId} onDone={() => setPanel(null)} />
 
-  const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name))
+  const sorted = [...people].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
   const open = openId ? sorted.find((p) => p.id === openId) ?? null : null
 
   return (
