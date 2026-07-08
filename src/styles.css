@@ -30,6 +30,14 @@ button, a, [role="radio"], [role="button"] { touch-action: manipulation; -webkit
   font-weight: 700; font-size: 14px; color: var(--color-ink); background: #fff;
   border: 2px solid var(--color-ink); border-radius: 9999px; padding: 8px 16px;
   min-height: 44px; cursor: pointer; text-decoration: none; }
+/* The big red button: each tab's one primary action, always under the title.
+   Ink text on tomato (not white) for AA contrast. */
+.big-red { display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; box-sizing: border-box; min-height: 56px; padding: 14px 20px;
+  font-family: inherit; font-weight: 800; font-size: 17px; color: var(--color-ink);
+  background: var(--color-tomato); border: 2px solid var(--color-ink);
+  border-radius: 16px; cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 0 rgb(0 0 0 / .12); }
 .marker-underline::after { content: ""; display: block; height: 6px; margin-top: -4px;
   background: var(--color-sunny); border-radius: 4px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

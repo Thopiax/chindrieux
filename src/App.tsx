@@ -1,7 +1,8 @@
 import { use$ } from '@legendapp/state/react'
 import { useRoute } from './nav'
 import { myId$ } from './identity'
-import { Today } from './screens/Today'
+import { useT } from './i18n'
+import { TabBar } from './components/TabBar'
 import { WhosHere } from './screens/WhosHere'
 import { Profiles } from './screens/Profiles'
 import { Costs } from './screens/Costs'
@@ -14,8 +15,6 @@ function screenFor(route: string) {
   switch (route) {
     case 'whoshere':
       return <WhosHere />
-    case 'profiles':
-      return <Profiles />
     case 'costs':
       return <Costs />
     case 'tournaments':
@@ -23,15 +22,18 @@ function screenFor(route: string) {
     case 'oscars':
       return <Oscars />
     case 'wifi':
+    case 'info':
       return <Wifi />
     case 'onboarding':
       return <Onboarding />
     default:
-      return <Today />
+      // '' and 'profiles': Crew is the landing tab.
+      return <Profiles />
   }
 }
 
 function App() {
+  const t = useT()
   const route = useRoute()
   const myId = use$(myId$)
   if (!myId) {
@@ -41,12 +43,29 @@ function App() {
       </main>
     )
   }
-  // Today is the front door: it carries the sticker-card navigation, and every
-  // other screen carries a back-to-today link, so no global nav bar is needed.
+  // Tabbed shell: a thin wordmark, the active tab's screen, and the fixed
+  // bottom TabBar. Bottom padding keeps content clear of the bar.
   return (
-    <main style={{ maxWidth: 640, margin: '0 auto', padding: '32px 20px 64px' }}>
-      {screenFor(route)}
-    </main>
+    <>
+      <main
+        style={{
+          maxWidth: 640, margin: '0 auto',
+          padding: '24px 20px calc(96px + env(safe-area-inset-bottom))',
+        }}
+      >
+        <p
+          className="marker-underline"
+          style={{
+            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
+            margin: '0 0 24px',
+          }}
+        >
+          {t('today.appTitle')}
+        </p>
+        {screenFor(route)}
+      </main>
+      <TabBar />
+    </>
   )
 }
 

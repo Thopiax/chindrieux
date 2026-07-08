@@ -16,6 +16,12 @@ export const dict = {
   'common.back': { en: 'Back', fr: 'Retour', pt: 'Voltar', nl: 'Terug' },
   'common.add': { en: 'Add', fr: 'Ajouter', pt: 'Adicionar', nl: 'Toevoegen' },
 
+  'tabs.crew': { en: 'Crew', fr: 'Bande', pt: 'Turma', nl: 'Bende' },
+  'tabs.costs': { en: 'Costs', fr: 'Comptes', pt: 'Contas', nl: 'Kosten' },
+  'tabs.games': { en: 'Games', fr: 'Jeux', pt: 'Jogos', nl: 'Spellen' },
+  'tabs.oscars': { en: 'Oscars', fr: 'Oscars', pt: 'Oscars', nl: 'Oscars' },
+  'tabs.info': { en: 'Info', fr: 'Infos', pt: 'Info', nl: 'Info' },
+
   'today.title': { en: 'Today', fr: "Aujourd'hui", pt: 'Hoje', nl: 'Vandaag' },
   'today.appTitle': { en: 'ChinChin 26', fr: 'ChinChin 26', pt: 'ChinChin 26', nl: 'ChinChin 26' },
   'today.myProfile': { en: 'My profile', fr: 'Mon profil', pt: 'Meu perfil', nl: 'Mijn profiel' },
@@ -57,7 +63,6 @@ export const dict = {
   'wifi.qrFailed': { en: 'Could not make the QR code.', fr: 'Impossible de créer le QR code.', pt: 'Não deu para gerar o QR code.', nl: 'Kon de QR-code niet maken.' },
   'wifi.copyFailed': { en: 'Copy failed. Select it to copy.', fr: 'Copie impossible. Sélectionne pour copier.', pt: 'Não copiou. Selecione para copiar.', nl: 'Kopiëren mislukt. Selecteer om te kopiëren.' },
 
-  'screen.backToToday': { en: 'Back to today', fr: "Retour à aujourd'hui", pt: 'Voltar para hoje', nl: 'Terug naar vandaag' },
 
   'whoshere.empty': { en: 'No dates on the calendar yet', fr: 'Pas encore de dates au calendrier', pt: 'Nenhuma data no calendário ainda', nl: 'Nog geen data op de kalender' },
   'whoshere.needDatesTitle': { en: 'Still need to pick dates', fr: 'Il manque encore des dates', pt: 'Ainda faltam datas', nl: 'Nog datums nodig' },

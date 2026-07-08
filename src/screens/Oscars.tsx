@@ -497,7 +497,6 @@ function Ceremony({
   const nominationById = new Map(nominations.map((n) => [n.id, n]))
 
   const gold = '#F5C542'
-  const linkStyle: CSSProperties = { color: gold, fontWeight: 700, textDecoration: 'none' }
 
   return (
     <div
@@ -506,10 +505,6 @@ function Ceremony({
         color: '#fff', borderRadius: 16, padding: '20px 16px 28px', margin: '-4px 0',
       }}
     >
-      <a href="#/" style={{ ...linkStyle, display: 'inline-block', marginBottom: 8 }}>
-        {'← '}{t('screen.backToToday')}
-      </a>
-
       <h1 style={{ color: gold, fontSize: 34, textAlign: 'center', margin: '8px 0 4px' }}>
         {'🏆 '}{t('oscars.ceremonyTitle')}
       </h1>
