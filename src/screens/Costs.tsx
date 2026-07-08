@@ -209,7 +209,7 @@ export function Costs() {
                   })()}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                     {(e.participant_ids ?? []).map((id) => (
-                      <Badge key={id} person={byId.get(id) ?? fallbackPerson(nameOf(id))} size="sm" />
+                      <Badge key={id} person={byId.get(id) ?? fallbackPerson(nameOf(id))} size="sm" nameTap />
                     ))}
                   </div>
                 </div>

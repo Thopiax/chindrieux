@@ -17,7 +17,17 @@ const DEFAULT_COLOR = '#C9C4B5'
 
 // Emoji in a colored ring. Falls back to the name's first letter when no emoji
 // is chosen yet, and to a neutral grey when no color is chosen yet.
-export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Size }) {
+// nameTap: opt-in tap-to-reveal name bubble. Off by default because the tap
+// swallows clicks, which breaks badges inside buttons (onboarding's "That's me").
+export function Badge({
+  person,
+  size = 'md',
+  nameTap = false,
+}: {
+  person: BadgePerson
+  size?: Size
+  nameTap?: boolean
+}) {
   const { box, font } = dims[size]
   // ponytail: tap toggles the name bubble; no auto-hide, tapping again dismisses.
   const [named, setNamed] = useState(false)
@@ -30,16 +40,29 @@ export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Siz
       aria-label={person.name || letter}
       title={person.name}
       className="badge-pin"
-      onClick={(e) => {
-        e.stopPropagation()
-        setNamed((v) => !v)
+      onClick={
+        nameTap
+          ? (e) => {
+              e.stopPropagation()
+              setNamed((v) => !v)
+            }
+          : undefined
+      }
+      style={{
+        width: box,
+        height: box,
+        color,
+        background: color,
+        fontSize: font,
+        lineHeight: 1,
+        position: 'relative',
+        cursor: nameTap ? 'pointer' : undefined,
       }}
-      style={{ width: box, height: box, color, background: color, fontSize: font, lineHeight: 1, position: 'relative', cursor: 'pointer' }}
     >
       {person.avatar_emoji ?? (
         <span style={{ color: '#fff', fontWeight: 800 }}>{letter}</span>
       )}
-      {named && person.name && <span className="badge-name">{person.name}</span>}
+      {nameTap && named && person.name && <span className="badge-name">{person.name}</span>}
     </span>
   )
 }

@@ -227,7 +227,7 @@ function NominationList({
             />
           )}
           <span style={{ flex: 1, fontWeight: 600 }}>{n.title}</span>
-          <Badge person={personOf(n.proposed_by)} size="sm" />
+          <Badge person={personOf(n.proposed_by)} size="sm" nameTap />
           <button
             type="button"
             style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
@@ -554,7 +554,7 @@ function Ceremony({
                       {'🏆 '}{winner.title}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      <Badge person={personOf(winner.proposed_by)} size="md" />
+                      <Badge person={personOf(winner.proposed_by)} size="md" nameTap />
                     </div>
                     <p style={{ color: gold, fontWeight: 700, fontSize: 18, margin: 0 }}>
                       {t('oscars.votes', { n: count })}

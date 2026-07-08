@@ -187,7 +187,7 @@ function CrewPulse({ t, people }: { t: T; people: Person[] }) {
           <Card key={g.key}>
             <p style={{ fontWeight: 700, margin: '0 0 10px', fontSize: 15 }}>{t(g.key)}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {g.people.map((p) => <Badge key={p.id} person={p} size="sm" />)}
+              {g.people.map((p) => <Badge key={p.id} person={p} size="sm" nameTap />)}
             </div>
           </Card>
         ))}
