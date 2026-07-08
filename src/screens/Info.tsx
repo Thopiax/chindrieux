@@ -6,9 +6,8 @@ import { appUrl, waShareUrl } from '../share.ts'
 import { todayISO } from '../today.ts'
 import { tripPhase } from '../domain/presence.ts'
 import { people$, useRows } from '../store.ts'
-import { WifiSection } from './Wifi.tsx'
 
-// The calm junk drawer: share the app, wifi, language. Its big red button is
+// The calm junk drawer: share the app and language. Its big red button is
 // the share link, which flips to the recap once the trip is over.
 export function Info() {
   const t = useT()
@@ -28,9 +27,6 @@ export function Info() {
       >
         {label}
       </a>
-
-      <h2 className="marker-underline">{t('wifi.title')}</h2>
-      <WifiSection />
 
       <Card style={{ marginTop: 24, textAlign: 'center' }}>
         <div style={{ display: 'grid', placeItems: 'center' }}>

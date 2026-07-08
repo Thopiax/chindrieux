@@ -18,7 +18,6 @@ function screenFor(route: string) {
       return <Tournaments />
     case 'oscars':
       return <Oscars />
-    case 'wifi':
     case 'info':
       return <Info />
     case 'onboarding':

@@ -2,13 +2,13 @@ import { useT } from '../i18n.ts'
 import { useRoute } from '../nav.ts'
 
 // The five experiences. Old deep-link routes stay as aliases so shared links
-// keep working: whoshere lives inside Crew, wifi inside Info.
+// keep working: whoshere lives inside Crew.
 const TABS = [
   { href: '#/', emoji: '🪪', key: 'tabs.crew', routes: ['', 'profiles', 'whoshere'] },
   { href: '#/costs', emoji: '💸', key: 'tabs.costs', routes: ['costs'] },
   { href: '#/tournaments', emoji: '🏆', key: 'tabs.games', routes: ['tournaments'] },
   { href: '#/oscars', emoji: '🎬', key: 'tabs.oscars', routes: ['oscars'] },
-  { href: '#/info', emoji: 'ℹ️', key: 'tabs.info', routes: ['info', 'wifi'] },
+  { href: '#/info', emoji: 'ℹ️', key: 'tabs.info', routes: ['info'] },
 ] as const
 
 export function TabBar() {

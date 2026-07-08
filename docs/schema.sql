@@ -97,7 +97,6 @@ create table votes (
 
 create table config (
   id text primary key,
-  wifi_ssid text, wifi_password text,
   oscars_phase text not null default 'proposing'
     check (oscars_phase in ('proposing','voting','revealed')),
   created_at timestamptz not null default now(),

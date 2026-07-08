@@ -36,5 +36,5 @@ export type Vote = SyncFields & {
   id: string; category_id: string; nomination_id: string; voter_id: string
 }
 export type Config = SyncFields & {
-  id: string; wifi_ssid: string | null; wifi_password: string | null; oscars_phase: OscarsPhase
+  id: string; oscars_phase: OscarsPhase
 }
