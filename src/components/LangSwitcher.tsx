@@ -39,7 +39,7 @@ export function LangSwitcher() {
             textTransform: 'uppercase',
             letterSpacing: 0.5,
             minWidth: 44,
-            minHeight: 40,
+            minHeight: 44,
             borderRadius: 9999,
             cursor: 'pointer',
             color: 'var(--color-ink)',

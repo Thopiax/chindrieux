@@ -67,6 +67,8 @@ export const dict = {
   'profiles.addMany': { en: '+ Add a bunch', fr: '+ Ajouter plusieurs', pt: '+ Adicionar vários', nl: '+ Meerdere toevoegen' },
   'profiles.addManyHint': { en: 'One name per line, or commas', fr: 'Un prénom par ligne, ou des virgules', pt: 'Um nome por linha, ou vírgulas', nl: 'Eén naam per regel, of komma\'s' },
   'profiles.editMyProfile': { en: 'Edit my profile', fr: 'Modifier mon profil', pt: 'Editar meu perfil', nl: 'Mijn profiel bewerken' },
+  'profiles.editProfile': { en: 'Edit profile', fr: 'Modifier le profil', pt: 'Editar perfil', nl: 'Profiel bewerken' },
+  'profiles.tapAgainDelete': { en: 'Tap again to delete', fr: 'Appuie encore pour supprimer', pt: 'Toque de novo pra excluir', nl: 'Tik nog eens om te verwijderen' },
   'profiles.addTitle': { en: 'Who is joining?', fr: 'Qui nous rejoint ?', pt: 'Quem tá chegando?', nl: 'Wie komt erbij?' },
   'profiles.theirName': { en: 'Their name', fr: 'Son prénom', pt: 'O nome da pessoa', nl: 'Hun naam' },
   'profiles.datesTbd': { en: 'Dates to come', fr: 'Dates à venir', pt: 'Datas a definir', nl: 'Data volgt nog' },
@@ -119,6 +121,8 @@ export const dict = {
   'costs.ibanPrompt': { en: 'Add your IBAN so friends can pay you', fr: 'Ajoute ton IBAN pour que les copains te remboursent', pt: 'Adicione seu IBAN pra galera te pagar', nl: 'Voeg je IBAN toe zodat vrienden je kunnen betalen' },
   'costs.ibanPlaceholder': { en: 'Your IBAN', fr: 'Ton IBAN', pt: 'Seu IBAN', nl: 'Je IBAN' },
   'costs.settled': { en: '{from} paid {to} {amount}', fr: '{from} a payé {amount} à {to}', pt: '{from} pagou {amount} pra {to}', nl: '{from} betaalde {amount} aan {to}' },
+  'costs.undoPayment': { en: 'Undo this payment', fr: 'Annuler ce paiement', pt: 'Desfazer este pagamento', nl: 'Deze betaling ongedaan maken' },
+  'costs.tapToUndo': { en: 'Tap again to undo', fr: 'Appuie encore pour annuler', pt: 'Toque de novo pra desfazer', nl: 'Tik nog eens om ongedaan te maken' },
 
   'tournaments.empty': { en: 'No tournaments yet. Start one!', fr: 'Pas encore de tournoi. Lance le premier !', pt: 'Nenhum torneio ainda. Comece um!', nl: 'Nog geen toernooien. Begin er een!' },
   'tournaments.newTournament': { en: '+ New tournament', fr: '+ Nouveau tournoi', pt: '+ Novo torneio', nl: '+ Nieuw toernooi' },

@@ -175,6 +175,7 @@ function UndatedRow({ person, t }: { person: Person; t: ReturnType<typeof useT> 
           <input
             type="date"
             value={person.arrival ?? ''}
+            max={person.departure ?? undefined}
             onChange={(e) => people$[person.id].assign({ arrival: e.target.value || null })}
             style={dateInput}
           />
@@ -184,6 +185,7 @@ function UndatedRow({ person, t }: { person: Person; t: ReturnType<typeof useT> 
           <input
             type="date"
             value={person.departure ?? ''}
+            min={person.arrival ?? undefined}
             onChange={(e) => people$[person.id].assign({ departure: e.target.value || null })}
             style={dateInput}
           />

@@ -55,8 +55,9 @@ const formFromPerson = (p: Person): Form => ({
 
 // first-run: fresh guest picking themselves (sets myId$).
 // edit: reopen my saved profile prefilled (keeps myId$).
+// edit-other: edit any other person's saved profile (never touches myId$).
 // add: create someone else without claiming them (never sets myId$).
-export type OnboardingMode = 'first-run' | 'edit' | 'add'
+export type OnboardingMode = 'first-run' | 'edit' | 'edit-other' | 'add'
 
 const primaryBtn = {
   fontFamily: 'inherit',
@@ -105,23 +106,28 @@ function StepActions({
 
 export function Onboarding({
   mode = 'first-run',
+  personId,
   onDone,
 }: {
   mode?: OnboardingMode
+  // Which person to edit in 'edit-other' mode; defaults to myId$ for 'edit'.
+  personId?: string
   onDone?: () => void
 } = {}) {
   const t = useT()
   const people = useRows(people$)
-  // Edit mode opens straight on the badge step, prefilled from my saved row.
-  const [step, setStep] = useState<Step>(() => (mode === 'edit' ? 2 : 1))
+  // Both edit variants open straight on the badge step, prefilled from a saved
+  // row: my own for 'edit', an arbitrary person for 'edit-other'.
+  const editing = mode === 'edit' || mode === 'edit-other'
+  const editId = mode === 'edit-other' ? (personId ?? null) : (myId$.peek() ?? null)
+  const [step, setStep] = useState<Step>(() => (editing ? 2 : 1))
   const [selectedId, setSelectedId] = useState<string | null>(() =>
-    mode === 'edit' ? (myId$.peek() ?? null) : null,
+    editing ? editId : null,
   )
   const [form, setForm] = useState<Form>(() => {
-    if (mode === 'edit') {
-      const id = myId$.peek()
-      const me = id ? (people$[id].peek() as Person | undefined) : undefined
-      if (me) return formFromPerson(me)
+    if (editing && editId) {
+      const row = people$[editId].peek() as Person | undefined
+      if (row) return formFromPerson(row)
     }
     return emptyForm
   })
@@ -162,17 +168,20 @@ export function Onboarding({
       const row: Person = { id, iban: null, ...fields }
       people$[id].set(row)
     }
-    // Adding someone else never claims them as me; first-run and edit do.
-    if (mode !== 'add') myId$.set(id)
+    // Only first-run and editing my own profile claim the row as me; adding or
+    // editing someone else never touches myId$.
+    if (mode === 'first-run' || mode === 'edit') myId$.set(id)
     finish()
   }
 
   const title =
     mode === 'edit'
       ? t('profiles.editMyProfile')
-      : mode === 'add'
-        ? t('profiles.addTitle')
-        : t('onboarding.title')
+      : mode === 'edit-other'
+        ? t('profiles.editProfile')
+        : mode === 'add'
+          ? t('profiles.addTitle')
+          : t('onboarding.title')
 
   return (
     <section>
@@ -205,7 +214,7 @@ export function Onboarding({
           form={form}
           onEmoji={(v) => set('emoji', v)}
           onColor={(v) => set('color', v)}
-          onBack={mode === 'edit' ? finish : () => setStep(1)}
+          onBack={editing ? finish : () => setStep(1)}
           onNext={() => setStep(3)}
         />
       )}
@@ -327,7 +336,7 @@ function StepBadge({
 }: {
   t: T
   form: Form
-  onEmoji: (v: string) => void
+  onEmoji: (v: string | null) => void
   onColor: (v: string) => void
   onBack: () => void
   onNext: () => void
@@ -387,10 +396,12 @@ function StepBadge({
           value={EMOJIS.includes(form.emoji ?? '') ? '' : (form.emoji ?? '')}
           onChange={(ev) => {
             // Keep only the last grapheme so pasting/typing several emoji works.
+            // An empty field clears the emoji to null so Badge's initial-letter
+            // fallback kicks in (an empty string would defeat its ?? fallback).
             const raw = ev.target.value.trim()
             let last = ''
             for (const g of new Intl.Segmenter().segment(raw)) last = g.segment
-            onEmoji(last)
+            onEmoji(last || null)
           }}
           placeholder="🫠"
           style={{
@@ -471,6 +482,7 @@ function StepVibes({
           <input
             type="date"
             value={form.arrival}
+            max={form.departure || undefined}
             onChange={(e) => set('arrival', e.target.value)}
             style={dateInput}
           />
@@ -480,6 +492,7 @@ function StepVibes({
           <input
             type="date"
             value={form.departure}
+            min={form.arrival || undefined}
             onChange={(e) => set('departure', e.target.value)}
             style={dateInput}
           />

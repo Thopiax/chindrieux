@@ -187,6 +187,7 @@ function SettleUp({
   payments: Payment[]
 }) {
   const [iban, setIban] = useState('')
+  const [pendingUndo, setPendingUndo] = useState<string | null>(null)
   const b = balances(expenses, payments)
   const transfers = suggestTransfers(b)
   const myBalance = b.get(myId) ?? 0
@@ -257,11 +258,35 @@ function SettleUp({
 
       {settled.length > 0 && (
         <ul style={{ listStyle: 'none', padding: 0, margin: '16px 0 0', display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {settled.map((p) => (
-            <li key={p.id} style={{ fontSize: 13, opacity: 0.7 }}>
-              {t('costs.settled', { from: nameOf(p.from_id), to: nameOf(p.to_id), amount: fmtEur(p.amount) })} ✓
-            </li>
-          ))}
+          {settled.map((p) => {
+            const armed = pendingUndo === p.id
+            return (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  aria-label={t('costs.undoPayment')}
+                  onClick={() => {
+                    if (armed) {
+                      payments$[p.id].deleted.set(true)
+                      setPendingUndo(null)
+                    } else {
+                      setPendingUndo(p.id)
+                    }
+                  }}
+                  style={{
+                    fontFamily: 'inherit', fontSize: 13, textAlign: 'left', width: '100%',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '6px 0',
+                    minHeight: 44, color: armed ? 'var(--color-tomato-text)' : 'var(--color-ink)',
+                    fontWeight: armed ? 700 : 400, opacity: armed ? 1 : 0.7,
+                  }}
+                >
+                  {armed
+                    ? t('costs.tapToUndo')
+                    : `${t('costs.settled', { from: nameOf(p.from_id), to: nameOf(p.to_id), amount: fmtEur(p.amount) })} ✓`}
+                </button>
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>
@@ -353,7 +378,7 @@ function ExpenseForm({
               disabled={checked.size === people.length}
               style={{
                 fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                padding: '6px 12px', borderRadius: 9999, border: '2px solid var(--color-ink)',
+                padding: '6px 12px', minHeight: 44, borderRadius: 9999, border: '2px solid var(--color-ink)',
                 background: 'var(--color-sunny)', color: 'var(--color-ink)',
                 opacity: checked.size === people.length ? 0.4 : 1,
               }}

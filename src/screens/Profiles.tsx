@@ -49,10 +49,11 @@ export function Profiles() {
   const myId = use$(myId$)
   const [openId, setOpenId] = useState<string | null>(null)
   // When set, the onboarding flow takes over the screen for editing/adding.
-  const [panel, setPanel] = useState<OnboardingMode | null>(null)
+  // personId targets a specific row when editing someone other than me.
+  const [panel, setPanel] = useState<{ mode: OnboardingMode; personId?: string } | null>(null)
   const [bulkOpen, setBulkOpen] = useState(false)
 
-  if (panel) return <Onboarding mode={panel} onDone={() => setPanel(null)} />
+  if (panel) return <Onboarding mode={panel.mode} personId={panel.personId} onDone={() => setPanel(null)} />
 
   const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name))
   const open = openId ? sorted.find((p) => p.id === openId) ?? null : null
@@ -104,12 +105,20 @@ export function Profiles() {
           person={open}
           isMe={open.id === myId}
           onClose={() => setOpenId(null)}
-          onEdit={() => setPanel('edit')}
+          onEdit={() =>
+            setPanel(
+              open.id === myId ? { mode: 'edit' } : { mode: 'edit-other', personId: open.id },
+            )
+          }
+          onDelete={() => {
+            people$[open.id].deleted.set(true)
+            setOpenId(null)
+          }}
         />
       )}
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button type="button" onClick={() => setPanel('add')} style={primaryBtn}>
+        <button type="button" onClick={() => setPanel({ mode: 'add' })} style={primaryBtn}>
           {t('profiles.addPerson')}
         </button>
         <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
@@ -184,14 +193,17 @@ function ProfileCard({
   isMe,
   onClose,
   onEdit,
+  onDelete,
 }: {
   t: T
   person: Person
   isMe: boolean
   onClose: () => void
   onEdit: () => void
+  onDelete: () => void
 }) {
   const lang = use$(lang$)
+  const [pendingDelete, setPendingDelete] = useState(false)
   const vibes: { on: boolean; emoji: string; label: string }[] = [
     { on: person.blaze ?? false, emoji: '🌿', label: t('onboarding.vibes.blaze') },
     { on: person.drink ?? false, emoji: '🍺', label: t('onboarding.vibes.drink') },
@@ -264,11 +276,21 @@ function ProfileCard({
         </div>
       </div>
 
-      {isMe && (
-        <button type="button" onClick={onEdit} style={{ ...primaryBtn, marginTop: 16 }}>
-          {t('profiles.editMyProfile')}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 16 }}>
+        <button type="button" onClick={onEdit} style={primaryBtn}>
+          {isMe ? t('profiles.editMyProfile') : t('profiles.editProfile')}
         </button>
-      )}
+        <button
+          type="button"
+          onClick={() => {
+            if (pendingDelete) onDelete()
+            else setPendingDelete(true)
+          }}
+          style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
+        >
+          {pendingDelete ? t('profiles.tapAgainDelete') : t('common.delete')}
+        </button>
+      </div>
     </Card>
   )
 }

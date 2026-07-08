@@ -6,9 +6,11 @@ import type { KeyboardEvent } from 'react'
 // selected yet the first option is the tab stop.
 
 // tabIndex for one radio: 0 for the selected option, or the first option when
-// the group has no selection; -1 otherwise.
+// the group has no selection; -1 otherwise. A current value that is not one of
+// the options (e.g. a typed custom emoji) counts as no selection, so the group
+// keeps its single tab stop on the first option.
 export function radioTabIndex<T>(value: T, current: T | null, options: readonly T[]): 0 | -1 {
-  if (current == null) return value === options[0] ? 0 : -1
+  if (current == null || !options.includes(current)) return value === options[0] ? 0 : -1
   return value === current ? 0 : -1
 }
 
