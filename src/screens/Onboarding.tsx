@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { LangSwitcher } from '../components/LangSwitcher.tsx'
+import { StayCalendar } from '../components/StayCalendar.tsx'
 import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { COLORS, EMOJIS } from '../avatars.ts'
@@ -476,27 +477,16 @@ function StepVibes({
     <div>
       <h2>{t('onboarding.datesAndVibes')}</h2>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-        <label style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, fontWeight: 700 }}>
-          {t('onboarding.arrival')}
-          <input
-            type="date"
-            value={form.arrival}
-            max={form.departure || undefined}
-            onChange={(e) => set('arrival', e.target.value)}
-            style={dateInput}
-          />
-        </label>
-        <label style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, fontWeight: 700 }}>
-          {t('onboarding.departure')}
-          <input
-            type="date"
-            value={form.departure}
-            min={form.arrival || undefined}
-            onChange={(e) => set('departure', e.target.value)}
-            style={dateInput}
-          />
-        </label>
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontWeight: 700, marginBottom: 8 }}>{t('onboarding.stayDates')}</p>
+        <StayCalendar
+          arrival={form.arrival}
+          departure={form.departure}
+          onChange={(arrival, departure) => {
+            set('arrival', arrival)
+            set('departure', departure)
+          }}
+        />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>

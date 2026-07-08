@@ -5,6 +5,7 @@ import { Card } from '../components/Card.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
 import { tripRange } from '../domain/presence.ts'
+import { eachDay } from '../domain/stay.ts'
 import type { Person } from '../domain/types.ts'
 import { todayISO } from '../today.ts'
 
@@ -13,28 +14,6 @@ import { todayISO } from '../today.ts'
 const BAR_FALLBACK = '#C9C4B5'
 const DAY_COL_PX = 44
 const NAME_COL_PX = 80
-
-// yyyy-mm-dd from a local Date. Kept local (not toISOString) so a day never
-// drifts across the UTC boundary.
-function isoOf(d: Date): string {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
-// Inclusive list of yyyy-mm-dd from start to end, anchored at noon so adding a
-// day never lands on a DST seam. Returns [] when start > end (degenerate range).
-function eachDay(start: string, end: string): string[] {
-  const out: string[] = []
-  const cur = new Date(`${start}T12:00:00`)
-  const last = new Date(`${end}T12:00:00`)
-  while (cur <= last) {
-    out.push(isoOf(cur))
-    cur.setDate(cur.getDate() + 1)
-  }
-  return out
-}
 
 function weekdayNarrow(iso: string, lang: Lang): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString(lang, { weekday: 'narrow' })

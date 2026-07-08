@@ -80,6 +80,8 @@ export const dict = {
   'onboarding.pickEmoji': { en: 'Which emoji is so you?', fr: 'Quel emoji te ressemble ?', pt: 'Qual emoji é a sua cara?', nl: 'Welke emoji ben jij?' },
   'onboarding.pickColor': { en: 'Pick a color (choose wisely)', fr: 'Ta couleur (choisis bien)', pt: 'Sua cor (escolha com sabedoria)', nl: 'Je kleur (kies verstandig)' },
   'onboarding.customEmoji': { en: 'Or type your own', fr: 'Ou tape le tien', pt: 'Ou digite o seu', nl: 'Of typ je eigen' },
+  'onboarding.stayDates': { en: 'When are you around?', fr: 'Tu es là quand ?', pt: 'Quando você vai estar aí?', nl: 'Wanneer ben je er?' },
+  'calendar.hint': { en: 'Tap your arrival, then your departure', fr: "Appuie sur ton arrivée, puis ton départ", pt: 'Toque na chegada, depois na partida', nl: 'Tik op je aankomst, dan je vertrek' },
   'onboarding.datesAndVibes': { en: 'Now, the important questions', fr: 'Passons aux questions sérieuses', pt: 'Agora, as perguntas que importam', nl: 'Nu de echte vragen' },
   'onboarding.work': { en: 'Work', fr: 'Boulot', pt: 'Trabalho', nl: 'Werk' },
   'onboarding.chill': { en: 'Chill', fr: 'Chill', pt: 'Relax', nl: 'Chill' },
