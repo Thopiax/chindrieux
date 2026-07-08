@@ -17,8 +17,9 @@ import { todayISO } from '../today.ts'
 type T = ReturnType<typeof useT>
 
 // Always two decimals with the euro sign; caller supplies euros.
+// Guarded so a partially-synced row (amount briefly undefined) renders €0.00 instead of crashing.
 function fmtEur(euros: number): string {
-  return `€${euros.toFixed(2)}`
+  return `€${(Number.isFinite(euros) ? euros : 0).toFixed(2)}`
 }
 // Transfers carry integer cents; render them as euros.
 function fmtCents(cents: number): string {
