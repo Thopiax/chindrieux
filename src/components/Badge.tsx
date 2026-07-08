@@ -30,7 +30,10 @@ export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Siz
       aria-label={person.name || letter}
       title={person.name}
       className="badge-pin"
-      onClick={() => setNamed((v) => !v)}
+      onClick={(e) => {
+        e.stopPropagation()
+        setNamed((v) => !v)
+      }}
       style={{ width: box, height: box, color, background: color, fontSize: font, lineHeight: 1, position: 'relative', cursor: 'pointer' }}
     >
       {person.avatar_emoji ?? (
