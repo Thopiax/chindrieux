@@ -32,7 +32,7 @@ const bigLine: CSSProperties = {
 }
 const cardHeading: CSSProperties = { fontWeight: 700, margin: '0 0 10px', fontSize: 15 }
 const badgeRow: CSSProperties = { display: 'flex', flexWrap: 'wrap', gap: 8 }
-const stack: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 20 }
+const stack: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 24 }
 
 // The six screens, as a sticker grid: the home's navigation.
 const stickers = [
@@ -54,9 +54,8 @@ export function Today() {
 
   return (
     <section>
-      <header style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+      <header style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
         <h1 className="marker-underline" style={{ flex: 1, margin: 0 }}>{t('today.appTitle')}</h1>
-        <LangSwitcher />
         {me && (
           <button
             type="button"
@@ -75,7 +74,7 @@ export function Today() {
 
       <nav
         aria-label={t('today.navAria')}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 18, marginTop: 32 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 20, marginTop: 40 }}
       >
         {stickers.map((s) => (
           <a
@@ -84,14 +83,18 @@ export function Today() {
             className="card-taped"
             style={{
               textAlign: 'center', textDecoration: 'none', color: 'var(--color-ink)',
-              fontWeight: 700, fontSize: 15, padding: '18px 8px',
+              fontWeight: 700, fontSize: 15, padding: '22px 8px',
             }}
           >
-            <span aria-hidden style={{ display: 'block', fontSize: 36, marginBottom: 6 }}>{s.emoji}</span>
+            <span aria-hidden style={{ display: 'block', fontSize: 36, marginBottom: 8 }}>{s.emoji}</span>
             {t(s.key)}
           </a>
         ))}
       </nav>
+
+      <footer style={{ display: 'grid', placeItems: 'center', marginTop: 48 }}>
+        <LangSwitcher />
+      </footer>
     </section>
   )
 }

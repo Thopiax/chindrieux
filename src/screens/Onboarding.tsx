@@ -61,25 +61,47 @@ export type OnboardingMode = 'first-run' | 'edit' | 'add'
 const primaryBtn = {
   fontFamily: 'inherit',
   fontWeight: 700,
-  fontSize: 16,
+  fontSize: 17,
   color: '#fff',
   background: 'var(--color-cerulean)',
   border: 'none',
   borderRadius: 9999,
-  padding: '10px 20px',
+  padding: '14px 24px',
+  minHeight: 48,
   cursor: 'pointer',
 } as const
 
-const ghostBtn = {
-  fontFamily: 'inherit',
-  fontWeight: 700,
-  fontSize: 15,
-  color: 'var(--color-ink)',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  padding: 4,
-} as const
+// Bottom action row: back on the left, primary action filling the thumb zone.
+function StepActions({
+  backLabel,
+  onBack,
+  nextLabel,
+  onNext,
+  nextDisabled = false,
+}: {
+  backLabel: string
+  onBack: () => void
+  nextLabel: string
+  onNext: () => void
+  nextDisabled?: boolean
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 28 }}>
+      <button type="button" onClick={onBack} className="back-chip">
+        {'← '}
+        {backLabel}
+      </button>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={nextDisabled}
+        style={{ ...primaryBtn, flex: 1, opacity: nextDisabled ? 0.4 : 1 }}
+      >
+        {nextLabel}
+      </button>
+    </div>
+  )
+}
 
 export function Onboarding({
   mode = 'first-run',
@@ -159,7 +181,7 @@ export function Onboarding({
         {mode === 'first-run' ? (
           <LangSwitcher />
         ) : (
-          <button type="button" onClick={finish} style={ghostBtn}>
+          <button type="button" onClick={finish} className="back-chip">
             {t('common.close')}
           </button>
         )}
@@ -312,9 +334,6 @@ function StepBadge({
 }) {
   return (
     <div>
-      <button type="button" onClick={onBack} style={ghostBtn}>
-        {t('common.back')}
-      </button>
       <h2>{t('onboarding.buildYourBadge')}</h2>
 
       <div style={{ display: 'grid', placeItems: 'center', margin: '12px 0 20px' }}>
@@ -360,6 +379,27 @@ function StepBadge({
         ))}
       </div>
 
+      <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, marginBottom: 24 }}>
+        {t('onboarding.customEmoji')}
+        <input
+          type="text"
+          inputMode="text"
+          value={EMOJIS.includes(form.emoji ?? '') ? '' : (form.emoji ?? '')}
+          onChange={(ev) => {
+            // Keep only the last grapheme so pasting/typing several emoji works.
+            const raw = ev.target.value.trim()
+            let last = ''
+            for (const g of new Intl.Segmenter().segment(raw)) last = g.segment
+            onEmoji(last)
+          }}
+          placeholder="🫠"
+          style={{
+            width: 72, fontSize: 24, textAlign: 'center', padding: '8px 4px',
+            borderRadius: 8, border: '2px solid var(--color-ink)', fontFamily: 'inherit',
+          }}
+        />
+      </label>
+
       <p style={{ fontWeight: 700, marginBottom: 8 }}>{t('onboarding.pickColor')}</p>
       <div
         role="radiogroup"
@@ -389,9 +429,12 @@ function StepBadge({
         ))}
       </div>
 
-      <button type="button" onClick={onNext} style={primaryBtn}>
-        {t('onboarding.next')}
-      </button>
+      <StepActions
+        backLabel={t('common.back')}
+        onBack={onBack}
+        nextLabel={t('onboarding.next')}
+        onNext={onNext}
+      />
     </div>
   )
 }
@@ -410,64 +453,73 @@ function StepVibes({
   onSave: () => void
 }) {
   const toggles: { key: 'blaze' | 'drink' | 'hasCar'; label: string }[] = [
-    { key: 'blaze', label: t('onboarding.vibes.blaze') },
-    { key: 'drink', label: t('onboarding.vibes.drink') },
-    { key: 'hasCar', label: t('onboarding.vibes.hasCar') },
+    { key: 'blaze', label: `🌿 ${t('onboarding.vibes.blaze')}` },
+    { key: 'drink', label: `🍷 ${t('onboarding.vibes.drink')}` },
+    { key: 'hasCar', label: `🚗 ${t('onboarding.vibes.hasCar')}` },
   ]
+  const dateInput = {
+    fontFamily: 'inherit', fontSize: 16, padding: '12px 10px', borderRadius: 8,
+    border: '2px solid var(--color-ink)', width: '100%', boxSizing: 'border-box',
+  } as const
   return (
     <div>
-      <button type="button" onClick={onBack} style={ghostBtn}>
-        {t('common.back')}
-      </button>
       <h2>{t('onboarding.datesAndVibes')}</h2>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 700 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+        <label style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, fontWeight: 700 }}>
           {t('onboarding.arrival')}
           <input
             type="date"
             value={form.arrival}
             onChange={(e) => set('arrival', e.target.value)}
-            style={{ fontFamily: 'inherit', fontSize: 16, padding: 8, borderRadius: 8, border: '2px solid var(--color-ink)' }}
+            style={dateInput}
           />
         </label>
-        <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 700 }}>
+        <label style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, fontWeight: 700 }}>
           {t('onboarding.departure')}
           <input
             type="date"
             value={form.departure}
             onChange={(e) => set('departure', e.target.value)}
-            style={{ fontFamily: 'inherit', fontSize: 16, padding: 8, borderRadius: 8, border: '2px solid var(--color-ink)' }}
+            style={dateInput}
           />
         </label>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
         {toggles.map((tg) => (
-          <label key={tg.key} style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700 }}>
+          <label
+            key={tg.key}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12, fontWeight: 700,
+              padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
+              border: '2px solid var(--color-ink)',
+              background: form[tg.key] ? 'var(--color-sunny)' : '#fff',
+            }}
+          >
             <input
               type="checkbox"
               checked={form[tg.key]}
               onChange={(e) => set(tg.key, e.target.checked)}
-              style={{ width: 20, height: 20 }}
+              style={{ width: 24, height: 24, flexShrink: 0 }}
             />
             {tg.label}
           </label>
         ))}
       </div>
 
-      <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 700, marginBottom: 20 }}>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontWeight: 700, marginBottom: 24 }}>
         {t('onboarding.vibes.worldCupTeam')}
         <input
           type="text"
           value={form.team}
           onChange={(e) => set('team', e.target.value)}
-          placeholder={t('onboarding.vibes.worldCupTeam')}
-          style={{ fontFamily: 'inherit', fontSize: 16, padding: '10px 12px', borderRadius: 8, border: '2px solid var(--color-ink)' }}
+          placeholder={t('onboarding.vibes.teamPlaceholder')}
+          style={{ ...dateInput, padding: '12px' }}
         />
       </label>
 
-      <div style={{ marginBottom: 24 }}>
+      <div>
         <p style={{ fontWeight: 700, marginBottom: 8 }}>{t('onboarding.vibes.workChill')}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span>{t('onboarding.work')}</span>
@@ -478,15 +530,18 @@ function StepVibes({
             value={form.mode}
             onChange={(e) => set('mode', Number(e.target.value))}
             aria-label={t('onboarding.vibes.workChill')}
-            style={{ flex: 1 }}
+            style={{ flex: 1, minHeight: 32 }}
           />
           <span>{t('onboarding.chill')}</span>
         </div>
       </div>
 
-      <button type="button" onClick={onSave} style={primaryBtn}>
-        {t('common.save')}
-      </button>
+      <StepActions
+        backLabel={t('common.back')}
+        onBack={onBack}
+        nextLabel={t('common.save')}
+        onNext={onSave}
+      />
     </div>
   )
 }

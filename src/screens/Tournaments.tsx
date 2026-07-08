@@ -135,7 +135,7 @@ function NewTournamentForm({ t, onClose }: { t: T; onClose: () => void }) {
             style={{ ...primaryBtn, opacity: canCreate ? 1 : 0.4 }}>
             {t('tournaments.create')}
           </button>
-          <button type="button" onClick={onClose} style={ghostBtn}>{t('common.cancel')}</button>
+          <button type="button" onClick={onClose} className="back-chip">{t('common.cancel')}</button>
         </div>
       </div>
     </Card>
@@ -183,7 +183,9 @@ function TournamentDetail({
 
   return (
     <div>
-      <button type="button" onClick={onBack} style={ghostBtn}>{`← ${t('common.back')}`}</button>
+      <div style={{ marginBottom: 16 }}>
+        <button type="button" onClick={onBack} className="back-chip">{`← ${t('common.back')}`}</button>
+      </div>
 
       <h2 className="marker-underline" style={{ margin: '12px 0' }}>{t('tournaments.standings')}</h2>
       {rows.length === 0 ? (

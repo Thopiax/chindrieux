@@ -50,6 +50,7 @@ export function Profiles() {
   const [openId, setOpenId] = useState<string | null>(null)
   // When set, the onboarding flow takes over the screen for editing/adding.
   const [panel, setPanel] = useState<OnboardingMode | null>(null)
+  const [bulkOpen, setBulkOpen] = useState(false)
 
   if (panel) return <Onboarding mode={panel} onDone={() => setPanel(null)} />
 
@@ -107,10 +108,73 @@ export function Profiles() {
         />
       )}
 
-      <button type="button" onClick={() => setPanel('add')} style={primaryBtn}>
-        {t('profiles.addPerson')}
-      </button>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <button type="button" onClick={() => setPanel('add')} style={primaryBtn}>
+          {t('profiles.addPerson')}
+        </button>
+        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
+          {t('profiles.addMany')}
+        </button>
+      </div>
+
+      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
     </Screen>
+  )
+}
+
+// Paste-a-list flow: one name per line (or commas) creates bare person rows.
+// Each guest finishes their own badge later via "That's me" on first open.
+function BulkAdd({ t, onDone }: { t: T; onDone: () => void }) {
+  const [text, setText] = useState('')
+  const names = text
+    .split(/[\n,]/)
+    .map((s) => s.trim())
+    .filter((s) => s !== '')
+
+  const add = () => {
+    for (const name of names) {
+      const id = crypto.randomUUID()
+      const row: Person = {
+        id, name, avatar_emoji: null, avatar_color: null, iban: null,
+        arrival: null, departure: null, blaze: null, drink: null, has_car: null,
+        world_cup_team: null, mode: null,
+      }
+      people$[id].set(row)
+    }
+    setText('')
+    onDone()
+  }
+
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>
+        {t('profiles.addManyHint')}
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={4}
+          placeholder={'Ana\nBruno\nChloé'}
+          style={{
+            display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 8,
+            fontFamily: 'inherit', fontSize: 16, padding: '10px 12px',
+            borderRadius: 8, border: '2px solid var(--color-ink)', resize: 'vertical',
+          }}
+        />
+      </label>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <button type="button" onClick={onDone} className="back-chip">
+          {t('common.cancel')}
+        </button>
+        <button
+          type="button"
+          onClick={add}
+          disabled={names.length === 0}
+          style={{ ...primaryBtn, flex: 1, opacity: names.length === 0 ? 0.4 : 1 }}
+        >
+          {t('common.add')}{names.length > 0 ? ` (${names.length})` : ''}
+        </button>
+      </div>
+    </Card>
   )
 }
 

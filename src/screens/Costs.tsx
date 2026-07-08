@@ -310,9 +310,11 @@ function ExpenseForm({
     onClose()
   }
 
+  const everyone = () =>
+    setOverrides(Object.fromEntries(people.map((p) => [p.id, true])))
+
   return (
     <div>
-      <button type="button" onClick={onClose} style={ghostBtn}>{t('common.cancel')}</button>
       <h2>{initial ? t('costs.editExpense') : t('costs.newExpense')}</h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12 }}>
@@ -343,7 +345,22 @@ function ExpenseForm({
         </div>
 
         <div>
-          <span style={fieldLabel}>{t('costs.splitBetween')}</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ ...fieldLabel, marginBottom: 0 }}>{t('costs.splitBetween')}</span>
+            <button
+              type="button"
+              onClick={everyone}
+              disabled={checked.size === people.length}
+              style={{
+                fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                padding: '6px 12px', borderRadius: 9999, border: '2px solid var(--color-ink)',
+                background: 'var(--color-sunny)', color: 'var(--color-ink)',
+                opacity: checked.size === people.length ? 0.4 : 1,
+              }}
+            >
+              {t('costs.everyone')}
+            </button>
+          </div>
           <PersonPicker people={people} selectedIds={checked} onToggle={toggle} />
         </div>
 
@@ -375,10 +392,13 @@ function ExpenseForm({
           )}
         </div>
 
-        <button type="button" onClick={save} disabled={!canSave}
-          style={{ ...primaryBtn, opacity: canSave ? 1 : 0.4 }}>
-          {t('common.save')}
-        </button>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button type="button" onClick={onClose} className="back-chip">{t('common.cancel')}</button>
+          <button type="button" onClick={save} disabled={!canSave}
+            style={{ ...primaryBtn, flex: 1, fontSize: 17, padding: '14px 24px', minHeight: 48, opacity: canSave ? 1 : 0.4 }}>
+            {t('common.save')}
+          </button>
+        </div>
       </div>
     </div>
   )

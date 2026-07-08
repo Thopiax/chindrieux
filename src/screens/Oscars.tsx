@@ -290,7 +290,7 @@ function NominationForm({ t, categoryId, myId }: { t: T; categoryId: string; myI
           style={{ ...primaryBtn, opacity: canSave ? 1 : 0.4 }}>
           {t('oscars.submitNomination')}
         </button>
-        <button type="button" onClick={() => setOpen(false)} style={ghostBtn}>{t('common.cancel')}</button>
+        <button type="button" onClick={() => setOpen(false)} className="back-chip">{t('common.cancel')}</button>
       </div>
     </div>
   )
@@ -324,7 +324,7 @@ function CategoryForm({ t, onClose }: { t: T; onClose: () => void }) {
           style={{ ...primaryBtn, opacity: canCreate ? 1 : 0.4 }}>
           {t('oscars.createCategory')}
         </button>
-        <button type="button" onClick={onClose} style={ghostBtn}>{t('common.cancel')}</button>
+        <button type="button" onClick={onClose} className="back-chip">{t('common.cancel')}</button>
       </div>
     </Card>
   )

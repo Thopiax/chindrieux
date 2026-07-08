@@ -107,7 +107,7 @@ function WifiForm({
           {t('common.save')}
         </button>
         {hasExisting && (
-          <button type="button" onClick={onDone} style={ghostBtn}>
+          <button type="button" onClick={onDone} className="back-chip">
             {t('common.cancel')}
           </button>
         )}

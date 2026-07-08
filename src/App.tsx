@@ -36,7 +36,7 @@ function App() {
   const myId = use$(myId$)
   if (!myId) {
     return (
-      <main style={{ maxWidth: 640, margin: '0 auto', padding: 16 }}>
+      <main style={{ maxWidth: 640, margin: '0 auto', padding: '32px 20px 64px' }}>
         <Onboarding />
       </main>
     )
@@ -44,7 +44,7 @@ function App() {
   // Today is the front door: it carries the sticker-card navigation, and every
   // other screen carries a back-to-today link, so no global nav bar is needed.
   return (
-    <main style={{ maxWidth: 640, margin: '0 auto', padding: 16 }}>
+    <main style={{ maxWidth: 640, margin: '0 auto', padding: '32px 20px 64px' }}>
       {screenFor(route)}
     </main>
   )

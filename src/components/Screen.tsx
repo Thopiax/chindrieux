@@ -7,13 +7,12 @@ export function Screen({ title, children }: { title: string; children: ReactNode
   const t = useT()
   return (
     <section>
-      <a
-        href="#/"
-        style={{ display: 'inline-block', fontWeight: 700, marginBottom: 12 }}
-      >
-        {'← '}
-        {t('screen.backToToday')}
-      </a>
+      <div style={{ marginBottom: 20 }}>
+        <a href="#/" className="back-chip">
+          {'← '}
+          {t('screen.backToToday')}
+        </a>
+      </div>
       <h1 className="marker-underline">{title}</h1>
       {children}
     </section>

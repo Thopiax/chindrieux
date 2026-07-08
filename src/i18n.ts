@@ -17,7 +17,7 @@ export const dict = {
   'common.add': { en: 'Add', fr: 'Ajouter', pt: 'Adicionar', nl: 'Toevoegen' },
 
   'today.title': { en: 'Today', fr: "Aujourd'hui", pt: 'Hoje', nl: 'Vandaag' },
-  'today.appTitle': { en: 'Chindrieux', fr: 'Chindrieux', pt: 'Chindrieux', nl: 'Chindrieux' },
+  'today.appTitle': { en: 'ChinChin 26', fr: 'ChinChin 26', pt: 'ChinChin 26', nl: 'ChinChin 26' },
   'today.myProfile': { en: 'My profile', fr: 'Mon profil', pt: 'Meu perfil', nl: 'Mijn profiel' },
   'today.navAria': { en: 'Screens', fr: 'Écrans', pt: 'Telas', nl: 'Schermen' },
   'today.daysToGo': { en: '{n} days to go ☀️', fr: 'Plus que {n} jours ☀️', pt: 'Faltam {n} dias ☀️', nl: 'Nog {n} dagen ☀️' },
@@ -64,6 +64,8 @@ export const dict = {
   'whoshere.setYourDates': { en: 'Set your dates', fr: 'Choisis tes dates', pt: 'Escolha suas datas', nl: 'Kies je datums' },
 
   'profiles.addPerson': { en: '+ Add person', fr: "+ Ajouter quelqu'un", pt: '+ Adicionar pessoa', nl: '+ Iemand toevoegen' },
+  'profiles.addMany': { en: '+ Add a bunch', fr: '+ Ajouter plusieurs', pt: '+ Adicionar vários', nl: '+ Meerdere toevoegen' },
+  'profiles.addManyHint': { en: 'One name per line, or commas', fr: 'Un prénom par ligne, ou des virgules', pt: 'Um nome por linha, ou vírgulas', nl: 'Eén naam per regel, of komma\'s' },
   'profiles.editMyProfile': { en: 'Edit my profile', fr: 'Modifier mon profil', pt: 'Editar meu perfil', nl: 'Mijn profiel bewerken' },
   'profiles.addTitle': { en: 'Who is joining?', fr: 'Qui nous rejoint ?', pt: 'Quem tá chegando?', nl: 'Wie komt erbij?' },
   'profiles.theirName': { en: 'Their name', fr: 'Son prénom', pt: 'O nome da pessoa', nl: 'Hun naam' },
@@ -73,25 +75,27 @@ export const dict = {
   'common.close': { en: 'Close', fr: 'Fermer', pt: 'Fechar', nl: 'Sluiten' },
   'common.uploadFailed': { en: 'Upload failed. Try again.', fr: "Échec de l'envoi. Réessaie.", pt: 'Falha no envio. Tente de novo.', nl: 'Uploaden mislukt. Probeer opnieuw.' },
 
-  'onboarding.title': { en: 'Welcome', fr: 'Bienvenue', pt: 'Bem-vindo', nl: 'Welkom' },
-  'onboarding.whoAreYou': { en: 'Who are you?', fr: "C'est qui, toi ?", pt: 'Quem é você?', nl: 'Wie ben jij?' },
-  'onboarding.imNew': { en: "I'm new here", fr: 'Je suis nouveau', pt: 'Sou novo por aqui', nl: 'Ik ben nieuw' },
-  'onboarding.namePlaceholder': { en: 'Your name', fr: 'Ton prénom', pt: 'Seu nome', nl: 'Je naam' },
+  'onboarding.title': { en: 'Hey, you made it!', fr: 'Salut toi !', pt: 'Aí, você chegou!', nl: 'Hé, daar ben je!' },
+  'onboarding.whoAreYou': { en: 'Who goes there?', fr: 'Qui va là ?', pt: 'Quem vem lá?', nl: 'Wie is daar?' },
+  'onboarding.imNew': { en: 'New around here', fr: 'Petit nouveau ici', pt: 'Novato por aqui', nl: 'Nieuw hier' },
+  'onboarding.namePlaceholder': { en: 'Your name (the real one)', fr: 'Ton prénom (le vrai)', pt: 'Seu nome (o de verdade)', nl: 'Je naam (je echte)' },
   'onboarding.thatsMe': { en: "That's me", fr: "C'est moi", pt: 'Sou eu', nl: 'Dat ben ik' },
   'onboarding.next': { en: 'Next', fr: 'Suivant', pt: 'Avançar', nl: 'Volgende' },
   'onboarding.buildYourBadge': { en: 'Build your badge', fr: 'Fais ton badge', pt: 'Monte seu crachá', nl: 'Maak je badge' },
-  'onboarding.pickEmoji': { en: 'Pick an emoji', fr: 'Choisis un emoji', pt: 'Escolha um emoji', nl: 'Kies een emoji' },
-  'onboarding.pickColor': { en: 'Pick a color', fr: 'Choisis une couleur', pt: 'Escolha uma cor', nl: 'Kies een kleur' },
-  'onboarding.datesAndVibes': { en: 'Dates and vibes', fr: 'Dates et ambiance', pt: 'Datas e vibe', nl: 'Data en sfeer' },
+  'onboarding.pickEmoji': { en: 'Which emoji is so you?', fr: 'Quel emoji te ressemble ?', pt: 'Qual emoji é a sua cara?', nl: 'Welke emoji ben jij?' },
+  'onboarding.pickColor': { en: 'Pick a color (choose wisely)', fr: 'Ta couleur (choisis bien)', pt: 'Sua cor (escolha com sabedoria)', nl: 'Je kleur (kies verstandig)' },
+  'onboarding.customEmoji': { en: 'Or type your own', fr: 'Ou tape le tien', pt: 'Ou digite o seu', nl: 'Of typ je eigen' },
+  'onboarding.datesAndVibes': { en: 'Now, the important questions', fr: 'Passons aux questions sérieuses', pt: 'Agora, as perguntas que importam', nl: 'Nu de echte vragen' },
   'onboarding.work': { en: 'Work', fr: 'Boulot', pt: 'Trabalho', nl: 'Werk' },
   'onboarding.chill': { en: 'Chill', fr: 'Chill', pt: 'Relax', nl: 'Chill' },
   'onboarding.arrival': { en: 'Arrival', fr: 'Arrivée', pt: 'Chegada', nl: 'Aankomst' },
   'onboarding.departure': { en: 'Departure', fr: 'Départ', pt: 'Partida', nl: 'Vertrek' },
-  'onboarding.vibes.blaze': { en: 'Down to blaze', fr: 'Chaud pour un joint', pt: 'Topa fumar', nl: 'Zin om te blowen' },
-  'onboarding.vibes.drink': { en: 'Down to drink', fr: 'Chaud pour boire', pt: 'Topa beber', nl: 'Zin om te drinken' },
-  'onboarding.vibes.hasCar': { en: 'Has a car', fr: 'A une voiture', pt: 'Tem carro', nl: 'Heeft een auto' },
-  'onboarding.vibes.worldCupTeam': { en: 'World Cup team', fr: 'Équipe de Coupe du Monde', pt: 'Time da Copa', nl: 'WK-team' },
-  'onboarding.vibes.workChill': { en: 'Work or chill', fr: 'Boulot ou chill', pt: 'Trabalho ou relax', nl: 'Werk of chill' },
+  'onboarding.vibes.blaze': { en: 'Do you smoke up?', fr: 'Tu fumes ?', pt: 'Você fuma um?', nl: 'Rook je mee?' },
+  'onboarding.vibes.drink': { en: 'First in line at apéro?', fr: "Premier à l'apéro ?", pt: 'Primeiro da fila no brinde?', nl: 'Eerste bij de borrel?' },
+  'onboarding.vibes.hasCar': { en: 'Bringing wheels?', fr: 'Tu ramènes une caisse ?', pt: 'Vem de carro (é o motora)?', nl: 'Neem je wielen mee?' },
+  'onboarding.vibes.worldCupTeam': { en: 'Screaming for who at the World Cup?', fr: 'Tu cries pour qui à la Coupe du Monde ?', pt: 'Torcendo pra quem na Copa?', nl: 'Voor wie schreeuw je bij het WK?' },
+  'onboarding.vibes.teamPlaceholder': { en: 'e.g. Brazil (correct answer)', fr: 'ex. le Brésil (bonne réponse)', pt: 'ex. Brasil (resposta certa)', nl: 'bijv. Brazilië (juiste antwoord)' },
+  'onboarding.vibes.workChill': { en: 'Laptop or hammock?', fr: 'Ordi ou transat ?', pt: 'Notebook ou rede?', nl: 'Laptop of hangmat?' },
 
   'langSwitcher.label': { en: 'Language', fr: 'Langue', pt: 'Idioma', nl: 'Taal' },
 
@@ -105,6 +109,7 @@ export const dict = {
   'costs.date': { en: 'Date', fr: 'Date', pt: 'Data', nl: 'Datum' },
   'costs.whoPaid': { en: 'Who paid?', fr: 'Qui a payé ?', pt: 'Quem pagou?', nl: 'Wie heeft betaald?' },
   'costs.splitBetween': { en: 'Split between', fr: 'À partager entre', pt: 'Dividir entre', nl: 'Verdelen over' },
+  'costs.everyone': { en: 'Everyone', fr: 'Tout le monde', pt: 'Todo mundo', nl: 'Iedereen' },
   'costs.addPhoto': { en: 'Add a photo', fr: 'Ajoute une photo', pt: 'Adicionar foto', nl: 'Foto toevoegen' },
   'costs.uploading': { en: 'Uploading...', fr: 'Envoi...', pt: 'Enviando...', nl: 'Uploaden...' },
   'costs.tapAgain': { en: 'Tap again to delete', fr: 'Appuie encore pour supprimer', pt: 'Toque de novo pra excluir', nl: 'Tik nog eens om te verwijderen' },
@@ -215,7 +220,10 @@ export const lang$ = observable<Lang>(initialLang())
 
 lang$.onChange(({ value }) => {
   if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_KEY, value)
+  if (typeof document !== 'undefined') document.documentElement.lang = value
 })
+
+if (typeof document !== 'undefined') document.documentElement.lang = lang$.peek()
 
 export function useT(): (key: string, vars?: Record<string, string | number>) => string {
   const lang = use$(lang$)
