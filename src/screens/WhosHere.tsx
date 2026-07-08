@@ -1,10 +1,9 @@
-import { Fragment } from 'react'
 import { use$ } from '@legendapp/state/react'
 import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
-import { tripRange } from '../domain/presence.ts'
+import { presentOn, tripRange } from '../domain/presence.ts'
 import { eachDay } from '../domain/stay.ts'
 import type { Person } from '../domain/types.ts'
 import { todayISO } from '../today.ts'
@@ -13,11 +12,11 @@ import { todayISO } from '../today.ts'
 
 const BAR_FALLBACK = '#C9C4B5'
 const DAY_COL_PX = 44
-const NAME_COL_PX = 80
 const BLEED_PX = 20 // must match <main>'s side padding in App.tsx
 
 // ponytail: hardcoded summer-2026 event dates; edit for the next trip
 const MARKERS: Record<string, { emoji: string; key: string }> = {
+  '2026-07-12': { emoji: '🎂', key: 'whoshere.markerLaeti' },
   '2026-07-14': { emoji: '🇫🇷⚽', key: 'whoshere.marker14juillet' },
   '2026-07-15': { emoji: '⚽', key: 'whoshere.markerSemi' },
   '2026-07-19': { emoji: '🏆', key: 'whoshere.markerFinal' },
@@ -44,14 +43,31 @@ export function WhosHereSection() {
 
   const range = tripRange(dated)
   const days = range ? eachDay(range.start, range.end) : []
-  const todayCol = days.indexOf(todayISO()) // -1 when today is outside the trip
+  const today = todayISO()
+  const todayCol = days.indexOf(today) // -1 when today is outside the trip
   const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
   const markerDays = days.filter((d) => MARKERS[d])
+
+  const hereToday = presentOn(dated, today)
+  const arriving = dated.filter((p) => p.arrival === today)
+  const leaving = dated.filter((p) => p.departure === today)
 
   return (
     <section>
       {days.length > 0 && dated.length > 0 ? (
         <>
+        {/* Today at a glance: crew count + who arrives/leaves. Only mid-trip. */}
+        {todayCol >= 0 && (
+          <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 700 }}>
+            {[
+              `👥 ${hereToday.length} ${t('today.hereNow').toLowerCase()}`,
+              arriving.length > 0 ? `👋 ${arriving.map((p) => p.name).join(', ')}` : null,
+              leaving.length > 0 ? `🧳 ${leaving.map((p) => p.name).join(', ')}` : null,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
         {/* Full bleed: cancel the page's side padding so the chart scrolls edge to edge. */}
         <div
           style={{
@@ -63,12 +79,12 @@ export function WhosHereSection() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: `${NAME_COL_PX}px repeat(${days.length}, 1fr)`,
+              gridTemplateColumns: `repeat(${days.length}, 1fr)`,
               columnGap: 0,
               rowGap: 8,
               alignItems: 'center',
               position: 'relative',
-              minWidth: NAME_COL_PX + days.length * DAY_COL_PX,
+              minWidth: days.length * DAY_COL_PX,
             }}
           >
             {/* Today gets a translucent sunny wash down the whole column. */}
@@ -76,7 +92,7 @@ export function WhosHereSection() {
               <div
                 aria-hidden
                 style={{
-                  gridColumn: 2 + todayCol,
+                  gridColumn: 1 + todayCol,
                   gridRow: `1 / ${lastRow + 1}`,
                   alignSelf: 'stretch',
                   background: 'var(--color-sunny)',
@@ -88,17 +104,18 @@ export function WhosHereSection() {
               />
             )}
 
-            {/* Event days get a dashed cerulean outline down the whole column. */}
+            {/* Event days get a translucent cerulean wash, mirroring the today one. */}
             {days.map((d, i) =>
               MARKERS[d] ? (
                 <div
                   key={`marker-${d}`}
                   aria-hidden
                   style={{
-                    gridColumn: 2 + i,
+                    gridColumn: 1 + i,
                     gridRow: `1 / ${lastRow + 1}`,
                     alignSelf: 'stretch',
-                    border: '2px dashed rgb(79 163 209 / .55)',
+                    background: 'var(--color-cerulean)',
+                    opacity: 0.18,
                     borderRadius: 8,
                     pointerEvents: 'none',
                     zIndex: 5,
@@ -107,10 +124,9 @@ export function WhosHereSection() {
               ) : null,
             )}
 
-            {/* Header row: corner + one cell per day. */}
-            <div style={cornerCell} />
+            {/* Header row: one cell per day. */}
             {days.map((d, i) => (
-              <div key={d} style={{ gridColumn: 2 + i, gridRow: 1, textAlign: 'center' }}>
+              <div key={d} style={{ gridColumn: 1 + i, gridRow: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: 11, textTransform: 'uppercase', opacity: 0.7 }}>
                   {weekdayNarrow(d, lang)}
                 </div>
@@ -121,17 +137,16 @@ export function WhosHereSection() {
               </div>
             ))}
 
-            {/* One row per person: sticky name cell + a bar across their stay. */}
+            {/* One row per person: a bar across their stay, name on the bar. */}
             {dated.map((p, r) => {
               const from = days.indexOf(p.arrival!)
               const to = days.indexOf(p.departure!)
               const row = 2 + r
               return (
-                <Fragment key={p.id}>
-                  <div style={{ ...nameCell, gridRow: row }}>{p.name}</div>
                   <div
+                    key={p.id}
                     style={{
-                      gridColumn: `${2 + from} / ${3 + to}`,
+                      gridColumn: `${1 + from} / ${2 + to}`,
                       gridRow: row,
                       display: 'flex',
                       alignItems: 'center',
@@ -146,19 +161,31 @@ export function WhosHereSection() {
                       zIndex: 1,
                     }}
                   >
-                    <Badge person={p} size="sm" />
+                    {/* Sticky within the bar: the label rides along on horizontal
+                        scroll but can never leave its own bar. */}
                     <span
                       style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
                         minWidth: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        position: 'sticky',
+                        left: BLEED_PX,
                       }}
                     >
-                      {p.name}
+                      <Badge person={p} size="sm" />
+                      <span
+                        style={{
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.name}
+                      </span>
                     </span>
                   </div>
-                </Fragment>
               )
             })}
           </div>
@@ -218,29 +245,6 @@ function UndatedRow({ person, t }: { person: Person; t: ReturnType<typeof useT> 
     </Card>
   )
 }
-
-const cornerCell = {
-  gridColumn: 1,
-  gridRow: 1,
-  position: 'sticky',
-  left: 0,
-  background: 'var(--color-paper)',
-  zIndex: 4,
-} as const
-
-const nameCell = {
-  gridColumn: 1,
-  position: 'sticky',
-  left: 0,
-  background: 'var(--color-paper)',
-  paddingRight: 8,
-  fontSize: 13,
-  fontWeight: 700,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  zIndex: 4,
-} as const
 
 const dateField = {
   display: 'flex',
