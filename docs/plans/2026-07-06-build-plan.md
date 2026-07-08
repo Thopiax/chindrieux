@@ -13,7 +13,7 @@
 - Package manager: **pnpm** only.
 - Functional style: no classes, `for...of` over `forEach`.
 - Allowed deps: exactly those in the Tech Stack line. Adding any other requires asking Rafa.
-- Money: EUR only. Domain math in **integer cents**; DB stores numeric euros.
+- Money: EUR only. All arithmetic in **integer cents**: domain functions convert DB euro amounts to cents at entry (one Math.round per row inside balances) and Transfer carries cents; Expense/Payment rows store numeric euros mirroring the DB schema.
 - Every UI string goes through the i18n dict with all four languages: **en, fr, pt, nl**. User-entered content is never translated.
 - No em dashes in any copy, comments, or commit messages.
 - Light theme only (sunny paper aesthetic, deliberate choice). Set `color-scheme: light`.

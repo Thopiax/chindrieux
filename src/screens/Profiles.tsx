@@ -1,0 +1,316 @@
+import { useState, type ReactNode } from 'react'
+import { use$ } from '@legendapp/state/react'
+import { Badge } from '../components/Badge.tsx'
+import { Card } from '../components/Card.tsx'
+import { Screen } from '../components/Screen.tsx'
+import { lang$, useT, type Lang } from '../i18n.ts'
+import { myId$ } from '../identity.ts'
+import { people$, useRows } from '../store.ts'
+import type { Person } from '../domain/types.ts'
+import { Onboarding, type OnboardingMode } from './Onboarding.tsx'
+
+type T = ReturnType<typeof useT>
+
+// yyyy-mm-dd anchored at local noon so toLocaleDateString never drifts a day.
+function fmtDate(iso: string, lang: Lang): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString(lang, {
+    day: 'numeric',
+    month: 'short',
+  })
+}
+
+const primaryBtn = {
+  fontFamily: 'inherit',
+  fontWeight: 700,
+  fontSize: 15,
+  color: '#fff',
+  background: 'var(--color-cerulean)',
+  border: 'none',
+  borderRadius: 9999,
+  padding: '9px 18px',
+  cursor: 'pointer',
+} as const
+
+const ghostBtn = {
+  fontFamily: 'inherit',
+  fontWeight: 700,
+  fontSize: 14,
+  color: 'var(--color-ink)',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '10px 12px',
+  minHeight: 44,
+} as const
+
+export function Profiles() {
+  const t = useT()
+  const people = useRows(people$)
+  const myId = use$(myId$)
+  const [openId, setOpenId] = useState<string | null>(null)
+  // When set, the onboarding flow takes over the screen for editing/adding.
+  // personId targets a specific row when editing someone other than me.
+  const [panel, setPanel] = useState<{ mode: OnboardingMode; personId?: string } | null>(null)
+  const [bulkOpen, setBulkOpen] = useState(false)
+
+  if (panel) return <Onboarding mode={panel.mode} personId={panel.personId} onDone={() => setPanel(null)} />
+
+  const sorted = [...people].sort((a, b) => a.name.localeCompare(b.name))
+  const open = openId ? sorted.find((p) => p.id === openId) ?? null : null
+
+  return (
+    <Screen title={t('profiles.title')}>
+      {sorted.length === 0 ? (
+        <p style={{ marginBottom: 20 }}>{t('profiles.empty')}</p>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
+            gap: 12,
+            marginBottom: 20,
+          }}
+        >
+          {sorted.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              aria-expanded={openId === p.id}
+              onClick={() => setOpenId((cur) => (cur === p.id ? null : p.id))}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 6,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 8,
+                opacity: open && openId !== p.id ? 0.5 : 1,
+              }}
+            >
+              <Badge person={p} size="md" />
+              <span style={{ fontWeight: 700 }}>
+                {p.name}
+                {p.id === myId ? ' ★' : ''}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <ProfileCard
+          t={t}
+          person={open}
+          isMe={open.id === myId}
+          onClose={() => setOpenId(null)}
+          onEdit={() =>
+            setPanel(
+              open.id === myId ? { mode: 'edit' } : { mode: 'edit-other', personId: open.id },
+            )
+          }
+          onDelete={() => {
+            people$[open.id].deleted.set(true)
+            setOpenId(null)
+          }}
+        />
+      )}
+
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <button type="button" onClick={() => setPanel({ mode: 'add' })} style={primaryBtn}>
+          {t('profiles.addPerson')}
+        </button>
+        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
+          {t('profiles.addMany')}
+        </button>
+      </div>
+
+      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
+    </Screen>
+  )
+}
+
+// Paste-a-list flow: one name per line (or commas) creates bare person rows.
+// Each guest finishes their own badge later via "That's me" on first open.
+function BulkAdd({ t, onDone }: { t: T; onDone: () => void }) {
+  const [text, setText] = useState('')
+  const names = text
+    .split(/[\n,]/)
+    .map((s) => s.trim())
+    .filter((s) => s !== '')
+
+  const add = () => {
+    for (const name of names) {
+      const id = crypto.randomUUID()
+      const row: Person = {
+        id, name, avatar_emoji: null, avatar_color: null, iban: null,
+        arrival: null, departure: null, blaze: null, drink: null, has_car: null,
+        world_cup_team: null, mode: null,
+      }
+      people$[id].set(row)
+    }
+    setText('')
+    onDone()
+  }
+
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>
+        {t('profiles.addManyHint')}
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={4}
+          placeholder={'Ana\nBruno\nChloé'}
+          style={{
+            display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 8,
+            fontFamily: 'inherit', fontSize: 16, padding: '10px 12px',
+            borderRadius: 8, border: '2px solid var(--color-ink)', resize: 'vertical',
+          }}
+        />
+      </label>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <button type="button" onClick={onDone} className="back-chip">
+          {t('common.cancel')}
+        </button>
+        <button
+          type="button"
+          onClick={add}
+          disabled={names.length === 0}
+          style={{ ...primaryBtn, flex: 1, opacity: names.length === 0 ? 0.4 : 1 }}
+        >
+          {t('common.add')}{names.length > 0 ? ` (${names.length})` : ''}
+        </button>
+      </div>
+    </Card>
+  )
+}
+
+function ProfileCard({
+  t,
+  person,
+  isMe,
+  onClose,
+  onEdit,
+  onDelete,
+}: {
+  t: T
+  person: Person
+  isMe: boolean
+  onClose: () => void
+  onEdit: () => void
+  onDelete: () => void
+}) {
+  const lang = use$(lang$)
+  const [pendingDelete, setPendingDelete] = useState(false)
+  const vibes: { on: boolean; emoji: string; label: string }[] = [
+    { on: person.blaze ?? false, emoji: '🌿', label: t('onboarding.vibes.blaze') },
+    { on: person.drink ?? false, emoji: '🍺', label: t('onboarding.vibes.drink') },
+    { on: person.has_car ?? false, emoji: '🚗', label: t('onboarding.vibes.hasCar') },
+  ].filter((v) => v.on)
+  const mode = person.mode ?? 50
+
+  return (
+    <Card style={{ marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <Badge person={person} size="md" />
+        <strong style={{ fontSize: 20, flex: 1 }}>{person.name}</strong>
+        <button type="button" onClick={onClose} aria-label={t('common.close')} style={ghostBtn}>
+          ✕
+        </button>
+      </div>
+
+      <p style={{ margin: '0 0 12px', fontWeight: 700 }}>
+        📍{' '}
+        {person.arrival && person.departure
+          ? `${fmtDate(person.arrival, lang)} → ${fmtDate(person.departure, lang)}`
+          : t('profiles.datesTbd')}
+      </p>
+
+      {(vibes.length > 0 || person.world_cup_team) && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+          {vibes.map((v) => (
+            <Chip key={v.label}>
+              {v.emoji} {v.label}
+            </Chip>
+          ))}
+          {person.world_cup_team && <Chip>⚽ {person.world_cup_team}</Chip>}
+        </div>
+      )}
+
+      <div>
+        <p style={{ margin: '0 0 6px', fontWeight: 700 }}>{t('onboarding.vibes.workChill')}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 13 }}>{t('onboarding.work')}</span>
+          <div
+            role="meter"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={mode}
+            aria-label={t('onboarding.vibes.workChill')}
+            style={{
+              position: 'relative',
+              flex: 1,
+              height: 10,
+              borderRadius: 9999,
+              background: 'var(--color-paper)',
+              border: '2px solid var(--color-ink)',
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: `${mode}%`,
+                width: 16,
+                height: 16,
+                borderRadius: 9999,
+                background: 'var(--color-sunny)',
+                border: '2px solid var(--color-ink)',
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          </div>
+          <span style={{ fontSize: 13 }}>{t('onboarding.chill')}</span>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 16 }}>
+        <button type="button" onClick={onEdit} style={primaryBtn}>
+          {isMe ? t('profiles.editMyProfile') : t('profiles.editProfile')}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (pendingDelete) onDelete()
+            else setPendingDelete(true)
+          }}
+          style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
+        >
+          {pendingDelete ? t('profiles.tapAgainDelete') : t('common.delete')}
+        </button>
+      </div>
+    </Card>
+  )
+}
+
+function Chip({ children }: { children: ReactNode }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontWeight: 700,
+        fontSize: 14,
+        padding: '4px 10px',
+        borderRadius: 9999,
+        background: 'var(--color-sunny)',
+        border: '2px solid var(--color-ink)',
+      }}
+    >
+      {children}
+    </span>
+  )
+}
