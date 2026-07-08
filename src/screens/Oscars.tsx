@@ -78,37 +78,68 @@ export function Oscars() {
   )
 }
 
-// ponytail: no host role, trust the group. Everyone sees the same three buttons.
+// ponytail: no host role, trust the group — but advancing the phase changes it
+// for EVERYONE, so it's one forward button with a tap-again confirm, not three
+// tab-looking toggles a stray thumb can flip.
 function PhaseFooter({ t, phase, dark = false }: { t: T; phase: OscarsPhase; dark?: boolean }) {
-  const activeBg = dark ? 'var(--color-sunny)' : 'var(--color-cerulean)'
-  const activeColor = dark ? '#2B2B2B' : '#fff'
-  const idleColor = dark ? 'rgba(255,255,255,0.75)' : 'var(--color-ink)'
-  const border = dark ? '2px solid rgba(255,210,63,0.5)' : '2px solid var(--color-ink)'
-  return (
-    <nav
+  const [armed, setArmed] = useState(false)
+  const next: OscarsPhase | null =
+    phase === 'proposing' ? 'voting' : phase === 'voting' ? 'revealed' : null
+  const prev: OscarsPhase | null =
+    phase === 'voting' ? 'proposing' : phase === 'revealed' ? 'voting' : null
+
+  const setPhase = (p: OscarsPhase) => {
+    config$['main'].oscars_phase.set(p)
+    setArmed(false)
+  }
+  const advance = () => (armed && next ? setPhase(next) : setArmed(true))
+
+  const dots = (
+    <p
       aria-label={t('oscars.phaseAria')}
-      style={{ display: 'flex', gap: 8, marginTop: 28, justifyContent: 'center' }}
+      style={{ margin: '0 0 12px', fontWeight: 700, fontSize: 13, opacity: dark ? 0.75 : 0.6 }}
     >
-      {PHASES.map((p) => {
-        const active = p === phase
-        return (
-          <button
-            key={p}
-            type="button"
-            aria-pressed={active}
-            onClick={() => config$['main'].oscars_phase.set(p)}
-            style={{
-              fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-              borderRadius: 9999, padding: '8px 16px', border,
-              background: active ? activeBg : 'transparent',
-              color: active ? activeColor : idleColor,
-            }}
-          >
-            {t(phaseKey[p])}
-          </button>
-        )
-      })}
-    </nav>
+      {PHASES.map((p) => (p === phase ? `● ${t(phaseKey[p])}` : `○ ${t(phaseKey[p])}`)).join('   ')}
+    </p>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 36 }}>
+      {dots}
+      {next && (
+        <button
+          type="button"
+          onClick={advance}
+          style={{
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 17, cursor: 'pointer',
+            borderRadius: 9999, padding: '14px 28px', minHeight: 48, border: 'none',
+            background: dark ? 'var(--color-sunny)' : 'var(--color-tomato)',
+            color: dark ? '#2B2B2B' : '#fff',
+          }}
+        >
+          {phase === 'proposing' ? t('oscars.startVoting') : t('oscars.startCeremony')}
+        </button>
+      )}
+      {armed && next && (
+        <p style={{ margin: '10px 0 0', fontWeight: 700, fontSize: 13, color: dark ? 'var(--color-sunny)' : 'var(--color-tomato-text)' }}>
+          {t('oscars.confirmPhase')}
+        </p>
+      )}
+      {prev && (
+        <button
+          type="button"
+          onClick={() => setPhase(prev)}
+          style={{
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+            background: 'none', border: 'none', marginTop: 14, padding: '8px 12px',
+            color: dark ? 'rgba(255,255,255,0.6)' : 'var(--color-ink)',
+            opacity: dark ? 1 : 0.6, textDecoration: 'underline',
+          }}
+        >
+          {phase === 'voting' ? t('oscars.backToProposing') : t('oscars.reopenVoting')}
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -240,7 +271,7 @@ function NominationForm({ t, categoryId, myId }: { t: T; categoryId: string; myI
 
   if (!open) {
     return (
-      <button type="button" style={ghostBtn} onClick={() => setOpen(true)}>
+      <button type="button" style={primaryBtn} onClick={() => setOpen(true)}>
         {t('oscars.nominate')}
       </button>
     )
@@ -344,8 +375,25 @@ function Voting({
   if (categories.length === 0) {
     return <p>{t('oscars.emptyCategories')}</p>
   }
+  const votable = categories.filter((c) => nominations.some((n) => n.category_id === c.id))
+  const done = votable.filter((c) =>
+    votes.some((v) => v.category_id === c.id && v.voter_id === myId),
+  ).length
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {votable.length > 0 && (
+        <p
+          style={{
+            margin: 0, fontWeight: 700, textAlign: 'center', padding: '10px 16px',
+            borderRadius: 9999, border: '2px solid var(--color-ink)',
+            background: done === votable.length ? 'var(--color-grass)' : 'var(--color-sunny)',
+          }}
+        >
+          {done === votable.length
+            ? t('oscars.allVoted')
+            : t('oscars.votedProgress', { done, total: votable.length })}
+        </p>
+      )}
       {categories.map((c) => (
         <VotingCategory
           key={c.id}
