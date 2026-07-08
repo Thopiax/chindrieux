@@ -168,7 +168,8 @@ export function Costs() {
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <Badge person={byId.get(e.payer_id) ?? fallbackPerson(nameOf(e.payer_id))} size="sm" />
-                    <span style={{ ...mono, fontWeight: 700, fontSize: 18 }}>{fmtCents(expenseTotal(e, people))}</span>
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>{nameOf(e.payer_id)}</span>
+                    <span style={{ ...mono, fontWeight: 700, fontSize: 18, flex: 1, textAlign: 'right' }}>{fmtCents(expenseTotal(e, people))}</span>
                   </div>
                   {e.per_head && (
                     <p style={{ ...hint, margin: '0 0 8px' }}>
@@ -318,8 +319,10 @@ function SettleUp({
               <Card key={`${tr.from}-${tr.to}`}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <Badge person={byId.get(tr.from) ?? fallbackPerson(nameOf(tr.from))} size="sm" />
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{nameOf(tr.from)}</span>
                   <span aria-hidden style={{ fontWeight: 700 }}>→</span>
                   <Badge person={payee ?? fallbackPerson(nameOf(tr.to))} size="sm" />
+                  <span style={{ fontWeight: 700, fontSize: 15 }}>{nameOf(tr.to)}</span>
                   <span style={{ ...mono, fontWeight: 700, fontSize: 17, flex: 1, textAlign: 'right' }}>
                     {fmtCents(tr.amount)}
                   </span>
