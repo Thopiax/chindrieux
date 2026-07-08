@@ -57,6 +57,11 @@ export const dict = {
   'profiles.datesTbd': { en: 'Dates to come', fr: 'Dates à venir', pt: 'Datas a definir', nl: 'Data volgt nog' },
   'profiles.empty': { en: 'Nobody here yet', fr: 'Personne pour le moment', pt: 'Ninguém por aqui ainda', nl: 'Nog niemand hier' },
 
+  'info.installTitle': { en: 'Put me on your home screen 📌', fr: "Mets-moi sur ton écran d'accueil 📌", pt: 'Me coloca na sua tela inicial 📌', nl: 'Zet me op je beginscherm 📌' },
+  'info.installIos': { en: 'Tap Share, then "Add to Home Screen"', fr: 'Appuie sur Partager, puis "Sur l\'écran d\'accueil"', pt: 'Toque em Compartilhar e depois em "Adicionar à Tela de Início"', nl: 'Tik op Delen en dan op "Zet op beginscherm"' },
+  'info.installButton': { en: 'Install the app', fr: "Installer l'appli", pt: 'Instalar o app', nl: 'Installeer de app' },
+  'info.installFallback': { en: 'In your browser menu, pick "Add to Home screen"', fr: 'Dans le menu du navigateur, choisis "Ajouter à l\'écran d\'accueil"', pt: 'No menu do navegador, escolha "Adicionar à tela inicial"', nl: 'Kies in je browsermenu "Toevoegen aan startscherm"' },
+
   'common.close': { en: 'Close', fr: 'Fermer', pt: 'Fechar', nl: 'Sluiten' },
   'common.uploadFailed': { en: 'Upload failed. Try again.', fr: "Échec de l'envoi. Réessaie.", pt: 'Falha no envio. Tente de novo.', nl: 'Uploaden mislukt. Probeer opnieuw.' },
 

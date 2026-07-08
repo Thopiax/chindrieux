@@ -7,6 +7,35 @@ import { todayISO } from '../today.ts'
 import { tripPhase } from '../domain/presence.ts'
 import { people$, useRows } from '../store.ts'
 
+// ponytail: platform sniff + one captured event, not a PWA install library
+let installPrompt: { prompt: () => void } | null = null
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault()
+  installPrompt = e as unknown as { prompt: () => void }
+})
+
+// Install hint: nothing when already installed, iOS gets the Share-menu tip,
+// Android gets a real install button (or the menu tip if Chrome never offered).
+function InstallHint() {
+  const t = useT()
+  if (matchMedia('(display-mode: standalone)').matches) return null
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent)
+  return (
+    <Card style={{ marginTop: 24, textAlign: 'center' }}>
+      <h3 style={{ margin: '0 0 12px' }}>{t('info.installTitle')}</h3>
+      {ios ? (
+        <p>{t('info.installIos')}</p>
+      ) : installPrompt ? (
+        <button type="button" className="back-chip" onClick={() => installPrompt?.prompt()}>
+          {t('info.installButton')}
+        </button>
+      ) : (
+        <p>{t('info.installFallback')}</p>
+      )}
+    </Card>
+  )
+}
+
 // The calm junk drawer: share the app and language. Its big red button is
 // the share link, which flips to the recap once the trip is over.
 export function Info() {
@@ -27,6 +56,8 @@ export function Info() {
       >
         {label}
       </a>
+
+      <InstallHint />
 
       <Card style={{ marginTop: 24, textAlign: 'center' }}>
         <div style={{ display: 'grid', placeItems: 'center' }}>
