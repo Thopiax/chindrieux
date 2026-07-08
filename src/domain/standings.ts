@@ -2,7 +2,8 @@ import type { Match } from './types.ts'
 
 type Standing = { personId: string; wins: number; losses: number }
 
-// Sorted by wins descending, then by win percentage descending.
+// Sorted by win percentage descending, then by wins descending.
+// ponytail: no minimum-games floor — a 1-0 player tops a 9-1 one; add a floor if it grates.
 export function standings(matches: Match[]): Standing[] {
   const rows = new Map<string, Standing>()
   const get = (id: string): Standing => {
@@ -21,5 +22,5 @@ export function standings(matches: Match[]): Standing[] {
     const played = r.wins + r.losses
     return played === 0 ? 0 : r.wins / played
   }
-  return [...rows.values()].sort((a, z) => z.wins - a.wins || pct(z) - pct(a))
+  return [...rows.values()].sort((a, z) => pct(z) - pct(a) || z.wins - a.wins)
 }

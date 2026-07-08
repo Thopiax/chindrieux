@@ -19,7 +19,7 @@ describe('standings', () => {
     expect(byId.get('c')).toEqual({ personId: 'c', wins: 0, losses: 2 })
   })
 
-  test('sorts by wins desc then win pct desc', () => {
+  test('equal win pct breaks ties by wins desc', () => {
     const rows = standings([
       match('m1', 'a', 'b'),
       match('m2', 'a', 'c'),
@@ -27,20 +27,21 @@ describe('standings', () => {
       match('m4', 'c', 'a'),
       // b: 1 win, 1 loss (50%); c: 1 win, 1 loss (50%); a: 2 wins, 2 losses (50%)
     ])
-    // a has most wins so ranks first
+    // all at 50%, a has most wins so ranks first
     expect(rows[0].personId).toBe('a')
   })
 
-  test('higher win pct ranks above equal-win lower pct', () => {
+  test('higher win pct ranks above more wins at lower pct', () => {
     const rows = standings([
       // x: 2 wins, 0 losses (100%)
       match('m1', 'x', 'z'),
       match('m2', 'x', 'z'),
-      // y: 2 wins, 2 losses (50%)
+      // y: 3 wins, 2 losses (60%) — more wins than x, lower pct
       match('m3', 'y', 'z'),
       match('m4', 'y', 'z'),
-      match('m5', 'z', 'y'),
+      match('m5', 'y', 'z'),
       match('m6', 'z', 'y'),
+      match('m7', 'z', 'y'),
     ])
     expect(rows[0].personId).toBe('x')
   })

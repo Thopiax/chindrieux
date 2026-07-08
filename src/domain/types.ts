@@ -1,4 +1,6 @@
-export type Game = 'pingpong' | 'chess' | 'foosball'
+// Known games get an emoji + translated label; anything else is a
+// user-typed sport rendered verbatim with a 🏆.
+export type Game = string
 export type OscarsPhase = 'proposing' | 'voting' | 'revealed'
 
 type SyncFields = { created_at?: string; updated_at?: string; deleted?: boolean }

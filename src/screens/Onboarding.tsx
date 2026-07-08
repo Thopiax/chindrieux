@@ -60,9 +60,8 @@ const formFromPerson = (p: Person): Form => ({
 
 // first-run: fresh guest picking themselves (sets myId$).
 // edit: reopen my saved profile prefilled (keeps myId$).
-// edit-other: edit any other person's saved profile (never touches myId$).
 // add: create someone else without claiming them (never sets myId$).
-export type OnboardingMode = 'first-run' | 'edit' | 'edit-other' | 'add'
+export type OnboardingMode = 'first-run' | 'edit' | 'add'
 
 const primaryBtn = {
   fontFamily: 'inherit',
@@ -111,20 +110,16 @@ function StepActions({
 
 export function Onboarding({
   mode = 'first-run',
-  personId,
   onDone,
 }: {
   mode?: OnboardingMode
-  // Which person to edit in 'edit-other' mode; defaults to myId$ for 'edit'.
-  personId?: string
   onDone?: () => void
 } = {}) {
   const t = useT()
   const people = useRows(people$)
-  // Both edit variants open straight on the badge step, prefilled from a saved
-  // row: my own for 'edit', an arbitrary person for 'edit-other'.
-  const editing = mode === 'edit' || mode === 'edit-other'
-  const editId = mode === 'edit-other' ? (personId ?? null) : (myId$.peek() ?? null)
+  // Edit mode opens straight on the badge step, prefilled from my saved row.
+  const editing = mode === 'edit'
+  const editId = myId$.peek() ?? null
   const [step, setStep] = useState<Step>(() => (editing ? 2 : 1))
   const [selectedId, setSelectedId] = useState<string | null>(() =>
     editing ? editId : null,
@@ -183,11 +178,9 @@ export function Onboarding({
   const title =
     mode === 'edit'
       ? t('profiles.editMyProfile')
-      : mode === 'edit-other'
-        ? t('profiles.editProfile')
-        : mode === 'add'
-          ? t('profiles.addTitle')
-          : t('onboarding.title')
+      : mode === 'add'
+        ? t('profiles.addTitle')
+        : t('onboarding.title')
 
   return (
     <section>

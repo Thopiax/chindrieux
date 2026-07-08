@@ -53,11 +53,10 @@ export function Profiles() {
   const myId = use$(myId$)
   const [openId, setOpenId] = useState<string | null>(null)
   // When set, the onboarding flow takes over the screen for editing/adding.
-  // personId targets a specific row when editing someone other than me.
-  const [panel, setPanel] = useState<{ mode: OnboardingMode; personId?: string } | null>(null)
+  const [panel, setPanel] = useState<OnboardingMode | null>(null)
   const [bulkOpen, setBulkOpen] = useState(false)
 
-  if (panel) return <Onboarding mode={panel.mode} personId={panel.personId} onDone={() => setPanel(null)} />
+  if (panel) return <Onboarding mode={panel} onDone={() => setPanel(null)} />
 
   const sorted = [...people].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
   const open = openId ? sorted.find((p) => p.id === openId) ?? null : null
@@ -114,11 +113,7 @@ export function Profiles() {
           person={open}
           isMe={open.id === myId}
           onClose={() => setOpenId(null)}
-          onEdit={() =>
-            setPanel(
-              open.id === myId ? { mode: 'edit' } : { mode: 'edit-other', personId: open.id },
-            )
-          }
+          onEdit={() => setPanel('edit')}
           onDelete={() => {
             people$[open.id].deleted.set(true)
             setOpenId(null)
@@ -126,7 +121,7 @@ export function Profiles() {
         />
       )}
 
-      <button type="button" className="big-red" onClick={() => setPanel({ mode: 'add' })}>
+      <button type="button" className="big-red" onClick={() => setPanel('add')}>
         {t('profiles.addPerson')}
       </button>
       <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 20px' }}>
@@ -349,9 +344,14 @@ function ProfileCard({
       </div>
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 16 }}>
-        <button type="button" onClick={onEdit} style={primaryBtn}>
-          {isMe ? t('profiles.editMyProfile') : t('profiles.editProfile')}
-        </button>
+        {/* ponytail: identity is per-device (myId$ isn't synced), so "claimed by
+            someone else" is unknowable — only your own row is editable. To fix
+            someone else's typo: delete + re-add, or hand them the link. */}
+        {isMe && (
+          <button type="button" onClick={onEdit} style={primaryBtn}>
+            {t('profiles.editMyProfile')}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => {

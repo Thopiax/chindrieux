@@ -10,8 +10,12 @@ import { todayISO } from '../today.ts'
 
 type T = ReturnType<typeof useT>
 
-const GAMES: readonly Game[] = ['pingpong', 'chess', 'foosball']
-const gameEmoji: Record<Game, string> = { pingpong: '🏓', chess: '♟️', foosball: '⚽' }
+const GAMES = ['pingpong', 'chess', 'foosball', 'tennis'] as const
+type KnownGame = (typeof GAMES)[number]
+const gameEmoji: Record<KnownGame, string> = { pingpong: '🏓', chess: '♟️', foosball: '⚽', tennis: '🎾' }
+
+const isKnown = (g: Game): g is KnownGame => (GAMES as readonly string[]).includes(g)
+const emojiOf = (g: Game): string => (isKnown(g) ? gameEmoji[g] : '🏆')
 
 const mono: CSSProperties = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }
 
@@ -51,7 +55,7 @@ export function Tournaments() {
 
   if (selected) {
     return (
-      <Screen title={`${gameEmoji[selected.game]} ${selected.name}`}>
+      <Screen title={`${emojiOf(selected.game)} ${selected.name}`}>
         <TournamentDetail
           t={t}
           tournament={selected}
@@ -90,7 +94,7 @@ export function Tournaments() {
                   font: 'inherit', color: 'var(--color-ink)', textAlign: 'left',
                 }}
               >
-                <span aria-hidden style={{ fontSize: 28, lineHeight: 1 }}>{gameEmoji[tr.game]}</span>
+                <span aria-hidden style={{ fontSize: 28, lineHeight: 1 }}>{emojiOf(tr.game)}</span>
                 <span style={{ fontWeight: 700, fontSize: 18 }}>{tr.name}</span>
                 <span aria-hidden style={{ marginLeft: 'auto', fontWeight: 700 }}>→</span>
               </button>
@@ -104,12 +108,15 @@ export function Tournaments() {
 
 function NewTournamentForm({ t, onClose }: { t: T; onClose: () => void }) {
   const [name, setName] = useState('')
-  const [game, setGame] = useState<Game>('pingpong')
-  const canCreate = name.trim() !== ''
+  const [game, setGame] = useState<KnownGame | 'other'>('pingpong')
+  const [customGame, setCustomGame] = useState('')
+  const canCreate = name.trim() !== '' && (game !== 'other' || customGame.trim() !== '')
 
   const create = () => {
     const id = crypto.randomUUID()
-    const row: Tournament = { id, name: name.trim(), game }
+    const row: Tournament = {
+      id, name: name.trim(), game: game === 'other' ? customGame.trim() : game,
+    }
     tournaments$[id].set(row)
     onClose()
   }
@@ -125,12 +132,25 @@ function NewTournamentForm({ t, onClose }: { t: T; onClose: () => void }) {
 
         <div>
           <span style={fieldLabel}>{t('tournaments.game')}</span>
-          <select value={game} onChange={(e) => setGame(e.target.value as Game)} style={inputStyle}>
+          <select
+            value={game}
+            onChange={(e) => setGame(e.target.value as KnownGame | 'other')}
+            style={inputStyle}
+          >
             {GAMES.map((g) => (
               <option key={g} value={g}>{`${gameEmoji[g]} ${t(`tournaments.game.${g}`)}`}</option>
             ))}
+            <option value="other">{`🏆 ${t('tournaments.game.other')}`}</option>
           </select>
         </div>
+
+        {game === 'other' && (
+          <label>
+            <span style={fieldLabel}>{t('tournaments.customGame')}</span>
+            <input type="text" value={customGame} onChange={(e) => setCustomGame(e.target.value)}
+              placeholder="Pétanque" style={inputStyle} />
+          </label>
+        )}
 
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <button type="button" onClick={create} disabled={!canCreate}
@@ -317,6 +337,25 @@ function TournamentDetail({
           ))}
         </div>
       )}
+
+      <div style={{ marginTop: 32, textAlign: 'center' }}>
+        <button
+          type="button"
+          style={{ ...ghostBtn, color: 'var(--color-tomato-text)' }}
+          onClick={() => {
+            if (pendingDelete === tournament.id) {
+              // Soft delete; matches stay in the store but are invisible
+              // (filtered by tournament_id), so an undelete restores everything.
+              tournaments$[tournament.id].deleted.set(true)
+              // useRows drops the row, so the list view renders on its own.
+            } else {
+              setPendingDelete(tournament.id)
+            }
+          }}
+        >
+          {pendingDelete === tournament.id ? t('tournaments.tapAgain') : t('tournaments.deleteTournament')}
+        </button>
+      </div>
     </div>
   )
 }
