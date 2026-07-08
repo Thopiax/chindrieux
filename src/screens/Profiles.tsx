@@ -6,8 +6,12 @@ import { Screen } from '../components/Screen.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { myId$ } from '../identity.ts'
 import { people$, useRows } from '../store.ts'
+import { daysUntil, presentOn, tripPhase, tripRange } from '../domain/presence.ts'
+import { appUrl, waShareUrl } from '../share.ts'
+import { todayISO } from '../today.ts'
 import type { Person } from '../domain/types.ts'
 import { Onboarding, type OnboardingMode } from './Onboarding.tsx'
+import { WhosHereSection } from './WhosHere.tsx'
 
 type T = ReturnType<typeof useT>
 
@@ -60,6 +64,18 @@ export function Profiles() {
 
   return (
     <Screen title={t('profiles.title')}>
+      <button type="button" className="big-red" onClick={() => setPanel({ mode: 'add' })}>
+        {t('profiles.addPerson')}
+      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 20px' }}>
+        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
+          {t('profiles.addMany')}
+        </button>
+      </div>
+      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
+
+      <CrewPulse t={t} people={people} />
+
       {sorted.length === 0 ? (
         <p style={{ marginBottom: 20 }}>{t('profiles.empty')}</p>
       ) : (
@@ -117,18 +133,74 @@ export function Profiles() {
         />
       )}
 
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button type="button" onClick={() => setPanel({ mode: 'add' })} style={primaryBtn}>
-          {t('profiles.addPerson')}
-        </button>
-        <button type="button" onClick={() => setBulkOpen((v) => !v)} style={ghostBtn}>
-          {t('profiles.addMany')}
-        </button>
-      </div>
-
-      {bulkOpen && <BulkAdd t={t} onDone={() => setBulkOpen(false)} />}
+      <h2 className="marker-underline">{t('whoshere.title')}</h2>
+      <WhosHereSection />
     </Screen>
   )
+}
+
+// Phase-aware cards at the top of Crew (moved from the old Today screen):
+// countdown + share link before the trip, today's arrivals/departures during.
+function CrewPulse({ t, people }: { t: T; people: Person[] }) {
+  const today = todayISO()
+  const phase = tripPhase(people, today)
+
+  if (phase === 'before') {
+    const range = tripRange(people)
+    const missing = people.filter((p) => !p.avatar_emoji || !p.arrival || !p.departure)
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 28 }}>
+        {range && (
+          <Card>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, margin: 0 }}>
+              {(() => {
+                const n = daysUntil(today, range.start)
+                return t(n === 1 ? 'today.daysToGo.one' : 'today.daysToGo', { n })
+              })()}
+            </p>
+            {missing.length > 0 && (
+              <p style={{ fontSize: 13, margin: '10px 0 0', opacity: 0.75 }}>
+                {t('today.stillMissing', { names: missing.map((p) => p.name).join(', ') })}
+              </p>
+            )}
+          </Card>
+        )}
+        <Card>
+          <a
+            href={waShareUrl(`${t('today.inviteLine')} ${appUrl()}`)}
+            target="_blank"
+            rel="noreferrer"
+            style={{ ...primaryBtn, display: 'inline-block', textDecoration: 'none' }}
+          >
+            {t('today.shareLink')}
+          </a>
+        </Card>
+      </div>
+    )
+  }
+
+  if (phase === 'during') {
+    const groups: { key: string; people: Person[] }[] = [
+      { key: 'today.arrivingToday', people: people.filter((p) => p.arrival === today) },
+      { key: 'today.leavingToday', people: people.filter((p) => p.departure === today) },
+      { key: 'today.hereNow', people: presentOn(people, today) },
+    ].filter((g) => g.people.length > 0)
+    if (groups.length === 0) return null
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 28 }}>
+        {groups.map((g) => (
+          <Card key={g.key}>
+            <p style={{ fontWeight: 700, margin: '0 0 10px', fontSize: 15 }}>{t(g.key)}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {g.people.map((p) => <Badge key={p.id} person={p} size="sm" />)}
+            </div>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  return null
 }
 
 // Paste-a-list flow: one name per line (or commas) creates bare person rows.

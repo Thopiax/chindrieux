@@ -110,6 +110,15 @@ export function Costs() {
 
   return (
     <Screen title={t('costs.title')}>
+      <button
+        type="button"
+        className="big-red"
+        style={{ marginBottom: 24 }}
+        onClick={() => setForm({ mode: 'add' })}
+      >
+        {t('costs.addExpense')}
+      </button>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
         {expenses.length === 0 ? (
           <p>{t('costs.empty')}</p>
@@ -160,10 +169,6 @@ export function Costs() {
           ))
         )}
       </div>
-
-      <button type="button" style={{ ...primaryBtn, marginBottom: 28 }} onClick={() => setForm({ mode: 'add' })}>
-        {t('costs.addExpense')}
-      </button>
 
       <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} />
     </Screen>

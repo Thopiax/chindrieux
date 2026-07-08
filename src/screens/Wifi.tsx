@@ -2,7 +2,6 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { use$ } from '@legendapp/state/react'
 import QRCode from 'qrcode'
 import { Card } from '../components/Card.tsx'
-import { Screen } from '../components/Screen.tsx'
 import { useT } from '../i18n.ts'
 import { config$ } from '../store.ts'
 
@@ -31,7 +30,8 @@ const overline: CSSProperties = {
 // (backslash, delimiters, quotes). Same regex the brief specifies verbatim.
 const esc = (s: string) => s.replace(/([\\;,:"'])/g, '\\$1')
 
-export function Wifi() {
+// Embedded in the Info tab (no screen wrapper of its own).
+export function WifiSection() {
   const t = useT()
   const ssid = use$(() => config$['main'].wifi_ssid.get() ?? '')
   const password = use$(() => config$['main'].wifi_password.get() ?? '')
@@ -39,14 +39,10 @@ export function Wifi() {
 
   const showForm = ssid.trim() === '' || editing
 
-  return (
-    <Screen title={t('wifi.title')}>
-      {showForm ? (
-        <WifiForm t={t} ssid={ssid} password={password} onDone={() => setEditing(false)} />
-      ) : (
-        <WifiCard t={t} ssid={ssid} password={password} onEdit={() => setEditing(true)} />
-      )}
-    </Screen>
+  return showForm ? (
+    <WifiForm t={t} ssid={ssid} password={password} onDone={() => setEditing(false)} />
+  ) : (
+    <WifiCard t={t} ssid={ssid} password={password} onEdit={() => setEditing(true)} />
   )
 }
 

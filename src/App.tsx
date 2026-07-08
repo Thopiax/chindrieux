@@ -3,18 +3,15 @@ import { useRoute } from './nav'
 import { myId$ } from './identity'
 import { useT } from './i18n'
 import { TabBar } from './components/TabBar'
-import { WhosHere } from './screens/WhosHere'
 import { Profiles } from './screens/Profiles'
 import { Costs } from './screens/Costs'
 import { Tournaments } from './screens/Tournaments'
 import { Oscars } from './screens/Oscars'
-import { Wifi } from './screens/Wifi'
+import { Info } from './screens/Info'
 import { Onboarding } from './screens/Onboarding'
 
 function screenFor(route: string) {
   switch (route) {
-    case 'whoshere':
-      return <WhosHere />
     case 'costs':
       return <Costs />
     case 'tournaments':
@@ -23,11 +20,11 @@ function screenFor(route: string) {
       return <Oscars />
     case 'wifi':
     case 'info':
-      return <Wifi />
+      return <Info />
     case 'onboarding':
       return <Onboarding />
     default:
-      // '' and 'profiles': Crew is the landing tab.
+      // '', 'profiles', 'whoshere': Crew is the landing tab and absorbs both.
       return <Profiles />
   }
 }

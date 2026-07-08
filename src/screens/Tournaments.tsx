@@ -65,6 +65,16 @@ export function Tournaments() {
 
   return (
     <Screen title={t('tournaments.title')}>
+      <div style={{ marginBottom: 24 }}>
+        {adding ? (
+          <NewTournamentForm t={t} onClose={() => setAdding(false)} />
+        ) : (
+          <button type="button" className="big-red" onClick={() => setAdding(true)}>
+            {t('tournaments.newTournament')}
+          </button>
+        )}
+      </div>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
         {tournaments.length === 0 ? (
           <p>{t('tournaments.empty')}</p>
@@ -88,14 +98,6 @@ export function Tournaments() {
           ))
         )}
       </div>
-
-      {adding ? (
-        <NewTournamentForm t={t} onClose={() => setAdding(false)} />
-      ) : (
-        <button type="button" style={primaryBtn} onClick={() => setAdding(true)}>
-          {t('tournaments.newTournament')}
-        </button>
-      )}
     </Screen>
   )
 }
@@ -154,6 +156,9 @@ function TournamentDetail({
   const [winnerId, setWinnerId] = useState('')
   const [loserId, setLoserId] = useState('')
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+  // The log form hides behind the big red button so the detail reads as
+  // standings first; logging is one tap away.
+  const [logOpen, setLogOpen] = useState(false)
 
   const byId = new Map(people.map((p) => [p.id, p]))
   const nameOf = (id: string) => byId.get(id)?.name ?? '?'
@@ -187,7 +192,61 @@ function TournamentDetail({
         <button type="button" onClick={onBack} className="back-chip">{`← ${t('common.back')}`}</button>
       </div>
 
-      <h2 className="marker-underline" style={{ margin: '12px 0' }}>{t('tournaments.standings')}</h2>
+      {!logOpen && (
+        <button type="button" className="big-red" onClick={() => setLogOpen(true)}>
+          {t('tournaments.logGame')}
+        </button>
+      )}
+      {logOpen && (
+        <section>
+          <h2 className="marker-underline" style={{ margin: '0 0 12px' }}>{t('tournaments.logGame')}</h2>
+          {people.length < 2 ? (
+            <p>{t('tournaments.needPeople')}</p>
+          ) : (
+            <Card>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <label>
+                  <span style={fieldLabel}>{t('tournaments.winner')}</span>
+                  <select value={winnerId} onChange={(e) => setWinnerId(e.target.value)} style={inputStyle}>
+                    <option value="">{t('tournaments.pickPerson')}</option>
+                    {people.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span style={fieldLabel}>{t('tournaments.loser')}</span>
+                  <select value={loserId} onChange={(e) => setLoserId(e.target.value)} style={inputStyle}>
+                    <option value="">{t('tournaments.pickPerson')}</option>
+                    {people.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </label>
+
+                {bothPicked && winnerId === loserId && (
+                  <p style={{ color: 'var(--color-tomato-text)', fontWeight: 700, margin: 0 }}>
+                    {t('tournaments.mustDiffer')}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <button type="button" onClick={() => setLogOpen(false)} className="back-chip">
+                    {t('common.cancel')}
+                  </button>
+                  <button type="button" onClick={log} disabled={!canLog}
+                    style={{ ...primaryBtn, flex: 1, opacity: canLog ? 1 : 0.4 }}>
+                    {t('tournaments.logIt')}
+                  </button>
+                </div>
+              </div>
+            </Card>
+          )}
+        </section>
+      )}
+
+      <h2 className="marker-underline" style={{ margin: '24px 0 12px' }}>{t('tournaments.standings')}</h2>
       {rows.length === 0 ? (
         <p>{t('tournaments.noStandings')}</p>
       ) : (
@@ -224,46 +283,6 @@ function TournamentDetail({
             </tbody>
           </table>
         </div>
-      )}
-
-      <h2 className="marker-underline" style={{ margin: '24px 0 12px' }}>{t('tournaments.logGame')}</h2>
-      {people.length < 2 ? (
-        <p>{t('tournaments.needPeople')}</p>
-      ) : (
-        <Card>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <label>
-              <span style={fieldLabel}>{t('tournaments.winner')}</span>
-              <select value={winnerId} onChange={(e) => setWinnerId(e.target.value)} style={inputStyle}>
-                <option value="">{t('tournaments.pickPerson')}</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              <span style={fieldLabel}>{t('tournaments.loser')}</span>
-              <select value={loserId} onChange={(e) => setLoserId(e.target.value)} style={inputStyle}>
-                <option value="">{t('tournaments.pickPerson')}</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </label>
-
-            {bothPicked && winnerId === loserId && (
-              <p style={{ color: 'var(--color-tomato-text)', fontWeight: 700, margin: 0 }}>
-                {t('tournaments.mustDiffer')}
-              </p>
-            )}
-
-            <button type="button" onClick={log} disabled={!canLog}
-              style={{ ...primaryBtn, opacity: canLog ? 1 : 0.4 }}>
-              {t('tournaments.logIt')}
-            </button>
-          </div>
-        </Card>
       )}
 
       <h2 className="marker-underline" style={{ margin: '24px 0 12px' }}>{t('tournaments.history')}</h2>

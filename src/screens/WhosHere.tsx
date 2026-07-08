@@ -2,7 +2,6 @@ import { Fragment } from 'react'
 import { use$ } from '@legendapp/state/react'
 import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
-import { Screen } from '../components/Screen.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
 import { tripRange } from '../domain/presence.ts'
@@ -45,7 +44,8 @@ function dayNumber(iso: string): number {
   return new Date(`${iso}T12:00:00`).getDate()
 }
 
-export function WhosHere() {
+// Embedded in the Crew tab (no screen wrapper of its own).
+export function WhosHereSection() {
   const t = useT()
   const lang = use$(lang$)
   const people = useRows(people$)
@@ -61,7 +61,7 @@ export function WhosHere() {
   const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
 
   return (
-    <Screen title={t('whoshere.title')}>
+    <section>
       {days.length > 0 && dated.length > 0 ? (
         <div style={{ overflowX: 'auto', marginBottom: 24, paddingBottom: 4 }}>
           <div
@@ -157,7 +157,7 @@ export function WhosHere() {
           ))}
         </section>
       )}
-    </Screen>
+    </section>
   )
 }
 
