@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Person } from '../domain/types.ts'
 
 type Size = 'sm' | 'md' | 'lg'
@@ -18,6 +19,8 @@ const DEFAULT_COLOR = '#C9C4B5'
 // is chosen yet, and to a neutral grey when no color is chosen yet.
 export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Size }) {
   const { box, font } = dims[size]
+  // ponytail: tap toggles the name bubble; no auto-hide, tapping again dismisses.
+  const [named, setNamed] = useState(false)
   const color = person.avatar_color ?? DEFAULT_COLOR
   // Guarded: a partially-synced row can render for a frame with name undefined.
   const letter = (person.name ?? '').trim().slice(0, 1).toUpperCase() || '?'
@@ -25,12 +28,15 @@ export function Badge({ person, size = 'md' }: { person: BadgePerson; size?: Siz
     <span
       role="img"
       aria-label={person.name || letter}
+      title={person.name}
       className="badge-pin"
-      style={{ width: box, height: box, color, background: color, fontSize: font, lineHeight: 1 }}
+      onClick={() => setNamed((v) => !v)}
+      style={{ width: box, height: box, color, background: color, fontSize: font, lineHeight: 1, position: 'relative', cursor: 'pointer' }}
     >
       {person.avatar_emoji ?? (
         <span style={{ color: '#fff', fontWeight: 800 }}>{letter}</span>
       )}
+      {named && person.name && <span className="badge-name">{person.name}</span>}
     </span>
   )
 }
