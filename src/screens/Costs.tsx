@@ -112,6 +112,7 @@ export function Costs() {
   const [form, setForm] = useState<{ mode: 'add' } | { mode: 'edit'; expense: Expense } | null>(
     () => (routeQuery().has('new') ? { mode: 'add' } : null),
   )
+  const [tab, setTab] = useState<'expenses' | 'settle'>('expenses')
   const [pendingDelete, setPendingDelete] = useArmed()
 
   // Drop the '?new' marker once the form closes so a reload stays closed.
@@ -140,6 +141,29 @@ export function Costs() {
 
   return (
     <Screen title={t('costs.title')}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        {([['expenses', t('costs.expenses')], ['settle', t('costs.settleUp')]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={tab === key}
+            onClick={() => setTab(key)}
+            style={{
+              fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+              padding: '8px 18px', minHeight: 44, borderRadius: 9999,
+              border: '2px solid var(--color-ink)', color: 'var(--color-ink)',
+              background: tab === key ? 'var(--color-sunny)' : 'transparent',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'settle' ? (
+        <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
+      ) : (
+        <>
       <button
         type="button"
         className="big-red"
@@ -149,8 +173,7 @@ export function Costs() {
         {t('costs.addExpense')}
       </button>
 
-      <h2 className="marker-underline" style={{ marginBottom: 12 }}>{t('costs.expenses')}</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28, marginBottom: 24 }}>
         {expenses.length === 0 ? (
           <p>{t('costs.empty')}</p>
         ) : (
@@ -222,8 +245,8 @@ export function Costs() {
           ))
         )}
       </div>
-
-      <SettleUp t={t} myId={myId} byId={byId} nameOf={nameOf} expenses={expenses} payments={payments} people={people} />
+        </>
+      )}
     </Screen>
   )
 }
@@ -264,8 +287,6 @@ function SettleUp({
 
   return (
     <section>
-      <h2 className="marker-underline" style={{ marginBottom: 12 }}>{t('costs.settleUp')}</h2>
-
       {myBalance !== 0 && (
         <p
           style={{
@@ -313,7 +334,7 @@ function SettleUp({
       {transfers.length === 0 ? (
         <p>{t('costs.allSquare')}</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {transfers.map((tr) => {
             const payee = byId.get(tr.to)
             return (

@@ -1,7 +1,6 @@
 import { use$ } from '@legendapp/state/react'
 import { useRoute } from './nav'
 import { myId$ } from './identity'
-import { useT } from './i18n'
 import { TabBar } from './components/TabBar'
 import { Profiles } from './screens/Profiles'
 import { Costs } from './screens/Costs'
@@ -29,7 +28,6 @@ function screenFor(route: string) {
 }
 
 function App() {
-  const t = useT()
   const route = useRoute()
   const myId = use$(myId$)
   if (!myId) {
@@ -49,15 +47,6 @@ function App() {
           padding: '24px 20px calc(96px + env(safe-area-inset-bottom))',
         }}
       >
-        <p
-          className="marker-underline"
-          style={{
-            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15,
-            margin: '0 0 24px',
-          }}
-        >
-          {t('today.appTitle')}
-        </p>
         {screenFor(route)}
       </main>
       <TabBar />
