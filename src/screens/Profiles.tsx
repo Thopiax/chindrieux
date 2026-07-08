@@ -64,10 +64,10 @@ export function Profiles() {
 
   return (
     <Screen title={t('profiles.title')}>
-      <CrewPulse t={t} people={people} />
-
-      <h2 className="marker-underline">{t('whoshere.title')}</h2>
+      <h2 className="marker-underline" style={{ marginTop: 0 }}>{t('whoshere.title')}</h2>
       <WhosHereSection />
+
+      <CrewPulse t={t} people={people} />
 
       {sorted.length === 0 ? (
         <p style={{ marginBottom: 20 }}>{t('profiles.empty')}</p>
