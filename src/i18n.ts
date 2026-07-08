@@ -75,6 +75,7 @@ export const dict = {
   'onboarding.imNew': { en: 'New around here', fr: 'Petit nouveau ici', pt: 'Novato por aqui', nl: 'Nieuw hier' },
   'onboarding.namePlaceholder': { en: 'Your name (the real one)', fr: 'Ton prénom (le vrai)', pt: 'Seu nome (o de verdade)', nl: 'Je naam (je echte)' },
   'onboarding.thatsMe': { en: "That's me", fr: "C'est moi", pt: 'Sou eu', nl: 'Dat ben ik' },
+  'onboarding.claimHint': { en: 'Only tap your own name 😉', fr: 'Appuie seulement sur ton prénom 😉', pt: 'Só toque no seu próprio nome 😉', nl: 'Tik alleen op je eigen naam 😉' },
   'onboarding.next': { en: 'Next', fr: 'Suivant', pt: 'Avançar', nl: 'Volgende' },
   'onboarding.buildYourBadge': { en: 'Build your badge', fr: 'Fais ton badge', pt: 'Monte seu crachá', nl: 'Maak je badge' },
   'onboarding.pickEmoji': { en: 'Which emoji is so you?', fr: 'Quel emoji te ressemble ?', pt: 'Qual emoji é a sua cara?', nl: 'Welke emoji ben jij?' },

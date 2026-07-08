@@ -291,6 +291,11 @@ function StepWho({
           ))}
         </div>
       )}
+      {!adding && people.length > 0 && (
+        <p style={{ fontSize: 13, fontWeight: 700, opacity: 0.65, margin: '-8px 0 20px' }}>
+          {t('onboarding.claimHint')}
+        </p>
+      )}
 
       <Card>
         <label htmlFor="name" style={{ display: 'block', fontWeight: 700, marginBottom: 8 }}>
