@@ -3,7 +3,7 @@ import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
-import { headcountOn, presentOn, tripRange } from '../domain/presence.ts'
+import { arrivingOn, departingOn, headcountOn, presentOn, tripRange } from '../domain/presence.ts'
 import { eachDay } from '../domain/stay.ts'
 import type { Person } from '../domain/types.ts'
 import { todayISO } from '../today.ts'
@@ -30,6 +30,13 @@ function dayNumber(iso: string): number {
   return new Date(`${iso}T12:00:00`).getDate()
 }
 
+// e.g. "Fri 11" — weekday plus day-of-month, for the movements list.
+function dayLabel(iso: string, lang: Lang): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString(lang, { weekday: 'short', day: 'numeric' })
+}
+
+type T = ReturnType<typeof useT>
+
 // Embedded in the Crew tab (no screen wrapper of its own).
 export function WhosHereSection() {
   const t = useT()
@@ -53,8 +60,21 @@ export function WhosHereSection() {
   const arriving = dated.filter((p) => p.arrival === today)
   const leaving = dated.filter((p) => p.departure === today)
 
+  // Days where someone arrives or leaves, in trip order.
+  const movements = days
+    .map((d) => ({ day: d, arrivals: arrivingOn(dated, d), departures: departingOn(dated, d) }))
+    .filter((m) => m.arrivals.length > 0 || m.departures.length > 0)
+
   return (
     <section>
+      {people.length > 0 && (
+        <p style={crewLine}>
+          {t(people.length === 1 ? 'whoshere.crewTotal.one' : 'whoshere.crewTotal', {
+            n: people.length,
+          })}
+        </p>
+      )}
+
       {days.length > 0 && dated.length > 0 ? (
         <>
         {/* Today at a glance: crew count + who arrives/leaves. Only mid-trip. */}
@@ -68,6 +88,23 @@ export function WhosHereSection() {
               .filter(Boolean)
               .join(' · ')}
           </p>
+        )}
+        {/* Every arrival and departure of the trip, day by day. */}
+        {movements.length > 0 && (
+          <Card style={{ marginBottom: 20 }}>
+            <h2 style={sectionHeading}>{t('whoshere.movementsTitle')}</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {movements.map((m) => (
+                <div key={m.day} style={movementRow}>
+                  <span style={movementDay}>{dayLabel(m.day, lang)}</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, flex: 1 }}>
+                    {m.arrivals.length > 0 && <MovementGroup icon="👋" people={m.arrivals} />}
+                    {m.departures.length > 0 && <MovementGroup icon="🧳" people={m.departures} />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         )}
         {/* Full bleed: cancel the page's side padding so the chart scrolls edge to edge. */}
         <div
@@ -229,7 +266,7 @@ export function WhosHereSection() {
       )}
 
       {undated.length > 0 && (
-        <section>
+        <section style={{ marginBottom: 20 }}>
           <h2 style={{ fontSize: 18, marginBottom: 12 }}>{t('whoshere.needDatesTitle')}</h2>
           {undated.map((p) => (
             <UndatedRow key={p.id} person={p} t={t} />
@@ -240,7 +277,23 @@ export function WhosHereSection() {
   )
 }
 
-function UndatedRow({ person, t }: { person: Person; t: ReturnType<typeof useT> }) {
+function MovementGroup({ icon, people }: { icon: string; people: Person[] }) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      <span aria-hidden>{icon}</span>
+      {people.map((p) => (
+        <span key={p.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+          <Badge person={p} size="sm" />
+          <span style={{ fontSize: 13, fontWeight: 700 }}>{p.name}</span>
+        </span>
+      ))}
+    </span>
+  )
+}
+
+
+
+function UndatedRow({ person, t }: { person: Person; t: T }) {
   return (
     <Card style={{ marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -273,6 +326,35 @@ function UndatedRow({ person, t }: { person: Person; t: ReturnType<typeof useT> 
     </Card>
   )
 }
+
+const crewLine = {
+  fontFamily: 'var(--font-display)',
+  fontSize: 24,
+  fontWeight: 700,
+  margin: '0 0 20px',
+} as const
+
+const sectionHeading = {
+  fontSize: 15,
+  fontWeight: 700,
+  margin: '0 0 12px',
+} as const
+
+const movementRow = {
+  display: 'flex',
+  alignItems: 'baseline',
+  gap: 12,
+} as const
+
+const movementDay = {
+  minWidth: 56,
+  fontSize: 13,
+  fontWeight: 700,
+  textTransform: 'capitalize',
+  opacity: 0.8,
+} as const
+
+
 
 const dateField = {
   display: 'flex',

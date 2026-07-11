@@ -32,6 +32,16 @@ export function headcountOn(people: Person[], date: string): number {
   return presentOn(people, date).length
 }
 
+// People whose stay starts on a given day.
+export function arrivingOn(people: Person[], date: string): Person[] {
+  return people.filter((p) => p.arrival === date)
+}
+
+// People whose stay ends on a given day.
+export function departingOn(people: Person[], date: string): Person[] {
+  return people.filter((p) => p.departure === date)
+}
+
 export function tripRange(people: Person[]): { start: string; end: string } | null {
   const arrivals: string[] = []
   const departures: string[] = []
