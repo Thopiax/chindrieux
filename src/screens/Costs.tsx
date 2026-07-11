@@ -325,34 +325,15 @@ function SettleUp({
         <p>{t('costs.allSquare')}</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {transfers.map((tr) => {
-            const payee = byId.get(tr.to)
-            return (
-              <Card key={`${tr.from}-${tr.to}`}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <Badge person={byId.get(tr.from) ?? fallbackPerson(nameOf(tr.from))} size="sm" />
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>{nameOf(tr.from)}</span>
-                  <span aria-hidden style={{ fontWeight: 700 }}>→</span>
-                  <Badge person={payee ?? fallbackPerson(nameOf(tr.to))} size="sm" />
-                  <span style={{ fontWeight: 700, fontSize: 15 }}>{nameOf(tr.to)}</span>
-                  <span style={{ ...mono, fontWeight: 700, fontSize: 17, flex: 1, textAlign: 'right' }}>
-                    {fmtCents(tr.amount)}
-                  </span>
-                </div>
-                {payee?.iban && <CopyIban t={t} iban={payee.iban} />}
-                <button
-                  type="button"
-                  style={{ ...primaryBtn, marginTop: 10 }}
-                  onClick={() => {
-                    const id = crypto.randomUUID()
-                    payments$[id].set({ id, from_id: tr.from, to_id: tr.to, amount: tr.amount / 100 })
-                  }}
-                >
-                  {t('costs.markPaid')}
-                </button>
-              </Card>
-            )
-          })}
+          {transfers.map((tr) => (
+            <TransferCard
+              key={`${tr.from}-${tr.to}`}
+              t={t}
+              transfer={tr}
+              from={byId.get(tr.from) ?? fallbackPerson(nameOf(tr.from))}
+              to={byId.get(tr.to) ?? fallbackPerson(nameOf(tr.to))}
+            />
+          ))}
         </div>
       )}
 
@@ -461,6 +442,93 @@ function CollapsibleSection({
       </button>
       {open && children}
     </div>
+  )
+}
+
+// One suggested transfer. The fast path is a single "Mark paid" tap that records
+// the full amount. "Sent part of it" reveals an amount field so a guest can log a
+// partial transfer: because balances are computed net of every payment, the
+// leftover simply reappears as a smaller suggested transfer on the next render.
+function TransferCard({
+  t, transfer, from, to,
+}: {
+  t: T
+  transfer: { from: string; to: string; amount: number }
+  from: Person
+  to: Person
+}) {
+  const [partial, setPartial] = useState(false)
+  const [sent, setSent] = useState('')
+
+  const record = (cents: number) => {
+    const id = crypto.randomUUID()
+    payments$[id].set({ id, from_id: transfer.from, to_id: transfer.to, amount: cents / 100 })
+  }
+
+  const euros = parseAmount(sent)
+  // Cap a partial at the amount owed on this line: paying more would just flip the
+  // balance the other way, which is never what "I sent some money" means here.
+  const cents = Number.isFinite(euros) ? Math.round(euros * 100) : NaN
+  const validPartial = Number.isFinite(cents) && cents > 0 && cents <= transfer.amount
+
+  return (
+    <Card>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <Badge person={from} size="sm" />
+        <span style={{ fontWeight: 700, fontSize: 15 }}>{from.name}</span>
+        <span aria-hidden style={{ fontWeight: 700 }}>→</span>
+        <Badge person={to} size="sm" />
+        <span style={{ fontWeight: 700, fontSize: 15 }}>{to.name}</span>
+        <span style={{ ...mono, fontWeight: 700, fontSize: 17, flex: 1, textAlign: 'right' }}>
+          {fmtCents(transfer.amount)}
+        </span>
+      </div>
+      {to.iban && <CopyIban t={t} iban={to.iban} />}
+
+      {partial ? (
+        <div style={{ marginTop: 10 }}>
+          <label>
+            <span style={fieldLabel}>{t('costs.amountSent')}</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={sent}
+              autoFocus
+              placeholder={(transfer.amount / 100).toFixed(2)}
+              onChange={(e) => setSent(e.target.value.replace(/[^0-9.,]/g, ''))}
+              style={{ ...inputStyle, ...mono }}
+            />
+          </label>
+          <p style={{ fontSize: 13, opacity: 0.7, margin: '6px 0 0' }}>{t('costs.partialHint')}</p>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 10 }}>
+            <button
+              type="button"
+              className="back-chip"
+              onClick={() => { setPartial(false); setSent('') }}
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              type="button"
+              style={{ ...primaryBtn, flex: 1, opacity: validPartial ? 1 : 0.4 }}
+              disabled={!validPartial}
+              onClick={() => { record(cents); setPartial(false); setSent('') }}
+            >
+              {t('costs.recordPayment')}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+          <button type="button" style={primaryBtn} onClick={() => record(transfer.amount)}>
+            {t('costs.markPaid')}
+          </button>
+          <button type="button" style={ghostBtn} onClick={() => setPartial(true)}>
+            {t('costs.sentPartial')}
+          </button>
+        </div>
+      )}
+    </Card>
   )
 }
 
