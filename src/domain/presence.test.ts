@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import type { Person } from './types.ts'
-import { daysUntil, headcountOn, isPresentOn, presentOn, tripPhase, tripRange } from './presence.ts'
+import { arrivingOn, daysUntil, departingOn, headcountOn, isPresentOn, presentOn, tripPhase, tripRange } from './presence.ts'
 
 function person(id: string, arrival: string | null, departure: string | null): Person {
   return {
@@ -64,6 +64,23 @@ describe('headcountOn', () => {
   })
   test('ignores people without dates', () => {
     expect(headcountOn(people, '2026-07-25')).toBe(0)
+  })
+})
+
+describe('arrivingOn / departingOn', () => {
+  const people = [
+    person('a', '2026-07-10', '2026-07-14'),
+    person('b', '2026-07-10', '2026-07-20'),
+    person('c', null, null),
+  ]
+
+  test('arrivingOn returns people who start that day', () => {
+    expect(arrivingOn(people, '2026-07-10').map((x) => x.id)).toEqual(['a', 'b'])
+    expect(arrivingOn(people, '2026-07-14')).toEqual([])
+  })
+  test('departingOn returns people who end that day', () => {
+    expect(departingOn(people, '2026-07-14').map((x) => x.id)).toEqual(['a'])
+    expect(departingOn(people, '2026-07-10')).toEqual([])
   })
 })
 

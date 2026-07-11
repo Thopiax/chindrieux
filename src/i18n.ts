@@ -62,6 +62,10 @@ export const dict = {
   'whoshere.empty': { en: 'No dates on the calendar yet', fr: 'Pas encore de dates au calendrier', pt: 'Nenhuma data no calendário ainda', nl: 'Nog geen data op de kalender' },
   'whoshere.headcount': { en: 'Here', fr: 'Présents', pt: 'Presentes', nl: 'Aanwezig' },
   'whoshere.peopleOnDay': { en: '{n} here', fr: '{n} présents', pt: '{n} presentes', nl: '{n} aanwezig' },
+  'whoshere.crewTotal': { en: 'We are {n} on the trip', fr: 'On est {n} pour le séjour', pt: 'Somos {n} na viagem', nl: 'We zijn met {n} op reis' },
+  'whoshere.crewTotal.one': { en: 'It is just you so far', fr: "Pour l'instant, il n'y a que toi", pt: 'Por enquanto é só você', nl: 'Voorlopig ben jij de enige' },
+  'whoshere.movementsTitle': { en: 'Arrivals & departures', fr: 'Arrivées & départs', pt: 'Chegadas & partidas', nl: 'Aankomsten & vertrek' },
+  'whoshere.hereEachDay': { en: 'Here each day', fr: 'Présents chaque jour', pt: 'Presentes por dia', nl: 'Aanwezig per dag' },
   'whoshere.needDatesTitle': { en: 'Still need to pick dates', fr: 'Il manque encore des dates', pt: 'Ainda faltam datas', nl: 'Nog datums nodig' },
   'whoshere.setYourDates': { en: 'Set your dates', fr: 'Choisis tes dates', pt: 'Escolha suas datas', nl: 'Kies je datums' },
 
