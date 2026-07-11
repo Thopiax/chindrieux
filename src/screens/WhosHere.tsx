@@ -3,7 +3,7 @@ import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
-import { presentOn, tripRange } from '../domain/presence.ts'
+import { headcountOn, presentOn, tripRange } from '../domain/presence.ts'
 import { eachDay } from '../domain/stay.ts'
 import type { Person } from '../domain/types.ts'
 import { todayISO } from '../today.ts'
@@ -45,7 +45,8 @@ export function WhosHereSection() {
   const days = range ? eachDay(range.start, range.end) : []
   const today = todayISO()
   const todayCol = days.indexOf(today) // -1 when today is outside the trip
-  const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
+  // Row 1 is the day header, row 2 the daily headcount, people are rows 3..n.
+  const lastRow = dated.length + 2
   const markerDays = days.filter((d) => MARKERS[d])
 
   const hereToday = presentOn(dated, today)
@@ -137,11 +138,38 @@ export function WhosHereSection() {
               </div>
             ))}
 
+            {/* Headcount row: how many people are here on each day. */}
+            {days.map((d, i) => {
+              const n = headcountOn(dated, d)
+              return (
+                <div
+                  key={`count-${d}`}
+                  style={{ gridColumn: 1 + i, gridRow: 2, textAlign: 'center', zIndex: 6 }}
+                >
+                  <span
+                    aria-label={t('whoshere.peopleOnDay', { n })}
+                    style={{
+                      display: 'inline-block',
+                      minWidth: 22,
+                      padding: '2px 6px',
+                      borderRadius: 9999,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      background: 'var(--color-ink)',
+                      color: 'var(--color-paper)',
+                    }}
+                  >
+                    {n}
+                  </span>
+                </div>
+              )
+            })}
+
             {/* One row per person: a bar across their stay, name on the bar. */}
             {dated.map((p, r) => {
               const from = days.indexOf(p.arrival!)
               const to = days.indexOf(p.departure!)
-              const row = 2 + r
+              const row = 3 + r
               return (
                   <div
                     key={p.id}
