@@ -7,8 +7,7 @@ import { PersonPicker } from '../components/PersonPicker.tsx'
 import { useT } from '../i18n.ts'
 import { myId$ } from '../identity.ts'
 import { expenses$, payments$, people$, useRows } from '../store.ts'
-import { balances, suggestTransfers } from '../domain/money.ts'
-import { presentOn } from '../domain/presence.ts'
+import { balances, shares, suggestTransfers } from '../domain/money.ts'
 import type { Expense, Payment, Person } from '../domain/types.ts'
 import { uploadPhoto } from '../photos.ts'
 import { routeQuery } from '../nav.ts'
@@ -43,29 +42,28 @@ const inputStyle: CSSProperties = {
 }
 const fieldLabel: CSSProperties = { display: 'block', fontWeight: 700, marginBottom: 6 }
 
-// Which people are ticked for a given date: present-on-date by default, then any
-// manual override the guest set this session wins (both checks and unchecks).
-function checkedFor(people: Person[], date: string, overrides: Record<string, boolean>): Set<string> {
-  const present = new Set(presentOn(people, date).map((p) => p.id))
+// Parse a euro amount the guest typed. Accepts a comma or a dot as the decimal
+// separator (a euro app has plenty of comma-locale users) and rounds to whole
+// cents. Returns NaN for anything that isn't a number so callers can gate save.
+function parseAmount(raw: string): number {
+  if (raw.trim() === '') return NaN
+  const n = Number(raw.replace(',', '.'))
+  return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN
+}
+
+// Which people are ticked: nobody by default, then whatever the guest checked.
+// We deliberately do not pre-select present-on-date people (too easy to miss an
+// unwanted tick); the guest picks the split explicitly.
+function checkedFor(people: Person[], overrides: Record<string, boolean>): Set<string> {
   const out = new Set<string>()
-  for (const p of people) {
-    const checked = p.id in overrides ? overrides[p.id] : present.has(p.id)
-    if (checked) out.add(p.id)
-  }
+  for (const p of people) if (overrides[p.id]) out.add(p.id)
   return out
 }
 
-// Rebuild the override map for an edited expense: record only the people whose
-// saved membership differs from what presence would default to on its date, so
-// a later date change still re-derives the untouched ones.
-function overridesFromExpense(people: Person[], e: Expense): Record<string, boolean> {
-  const present = new Set(presentOn(people, e.date).map((p) => p.id))
-  const chosen = new Set(e.participant_ids)
+// Seed the override map for an edited expense from its saved participants.
+function overridesFromExpense(e: Expense): Record<string, boolean> {
   const out: Record<string, boolean> = {}
-  for (const p of people) {
-    const actual = chosen.has(p.id)
-    if (actual !== present.has(p.id)) out[p.id] = actual
-  }
+  for (const id of e.participant_ids) out[id] = true
   return out
 }
 
@@ -308,15 +306,26 @@ function ExpenseForm({
   const [date, setDate] = useState(initial?.date ?? todayISO())
   const [payerId, setPayerId] = useState(initial?.payer_id ?? myId)
   const [overrides, setOverrides] = useState<Record<string, boolean>>(() =>
-    initial ? overridesFromExpense(people, initial) : {},
+    initial ? overridesFromExpense(initial) : {},
   )
   const [photoUrl, setPhotoUrl] = useState<string | null>(initial?.photo_url ?? null)
   const [uploading, setUploading] = useState(false)
   const [uploadFailed, setUploadFailed] = useState(false)
 
-  const checked = checkedFor(people, date, overrides)
-  const amountNum = Math.round(Number(amount) * 100) / 100
+  const checked = checkedFor(people, overrides)
+  const amountNum = parseAmount(amount)
   const canSave = label.trim() !== '' && amountNum > 0 && checked.size > 0
+
+  // Per-person share of the current split, in cents, so each ticked person's
+  // slice shows next to their name. Remainder cents land on the first ticked.
+  const split =
+    amountNum > 0 && checked.size > 0
+      ? shares(Math.round(amountNum * 100), [...checked])
+      : null
+  const shareOf = (id: string) => {
+    const c = split?.get(id)
+    return c === undefined ? null : fmtCents(c)
+  }
 
   const toggle = (id: string) =>
     setOverrides((o) => ({ ...o, [id]: !checked.has(id) }))
@@ -352,8 +361,10 @@ function ExpenseForm({
 
         <label>
           <span style={fieldLabel}>{t('costs.amount')}</span>
-          <input type="number" step="0.01" min="0" inputMode="decimal" value={amount}
-            onChange={(e) => setAmount(e.target.value)} style={{ ...inputStyle, ...mono }} />
+          <input type="text" inputMode="decimal" value={amount}
+            placeholder="0.00"
+            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.,]/g, ''))}
+            style={{ ...inputStyle, ...mono }} />
         </label>
 
         <label>
@@ -387,7 +398,7 @@ function ExpenseForm({
               {t('costs.everyone')}
             </button>
           </div>
-          <PersonPicker people={people} selectedIds={checked} onToggle={toggle} />
+          <PersonPicker people={people} selectedIds={checked} onToggle={toggle} noteOf={shareOf} />
         </div>
 
         <div>
