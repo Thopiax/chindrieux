@@ -10,6 +10,11 @@ export function presentOn(people: Person[], date: string): Person[] {
   return people.filter((p) => isPresentOn(p, date))
 }
 
+// How many people are present on a given day.
+export function headcountOn(people: Person[], date: string): number {
+  return presentOn(people, date).length
+}
+
 export function tripRange(people: Person[]): { start: string; end: string } | null {
   const arrivals: string[] = []
   const departures: string[] = []

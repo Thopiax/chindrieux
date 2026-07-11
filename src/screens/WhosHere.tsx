@@ -5,7 +5,7 @@ import { Card } from '../components/Card.tsx'
 import { Screen } from '../components/Screen.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { people$, useRows } from '../store.ts'
-import { tripRange } from '../domain/presence.ts'
+import { headcountOn, tripRange } from '../domain/presence.ts'
 import type { Person } from '../domain/types.ts'
 import { todayISO } from '../today.ts'
 
@@ -58,7 +58,8 @@ export function WhosHere() {
   const range = tripRange(dated)
   const days = range ? eachDay(range.start, range.end) : []
   const todayCol = days.indexOf(todayISO()) // -1 when today is outside the trip
-  const lastRow = dated.length + 1 // header is row 1, people are rows 2..n
+  // Row 1 is the day header, row 2 the daily headcount, people are rows 3..n.
+  const lastRow = dated.length + 2
 
   return (
     <Screen title={t('whoshere.title')}>
@@ -103,11 +104,39 @@ export function WhosHere() {
               </div>
             ))}
 
+            {/* Headcount row: how many people are here on each day. */}
+            <div style={{ ...headcountLabelCell, gridRow: 2 }}>{t('whoshere.headcount')}</div>
+            {days.map((d, i) => {
+              const n = headcountOn(dated, d)
+              return (
+                <div
+                  key={`count-${d}`}
+                  style={{ gridColumn: 2 + i, gridRow: 2, textAlign: 'center', zIndex: 6 }}
+                >
+                  <span
+                    aria-label={t('whoshere.peopleOnDay', { n })}
+                    style={{
+                      display: 'inline-block',
+                      minWidth: 22,
+                      padding: '2px 6px',
+                      borderRadius: 9999,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      background: 'var(--color-ink)',
+                      color: 'var(--color-paper)',
+                    }}
+                  >
+                    {n}
+                  </span>
+                </div>
+              )
+            })}
+
             {/* One row per person: sticky name cell + a bar across their stay. */}
             {dated.map((p, r) => {
               const from = days.indexOf(p.arrival!)
               const to = days.indexOf(p.departure!)
-              const row = 2 + r
+              const row = 3 + r
               return (
                 <Fragment key={p.id}>
                   <div style={{ ...nameCell, gridRow: row }}>{p.name}</div>
@@ -201,6 +230,21 @@ const cornerCell = {
   position: 'sticky',
   left: 0,
   background: 'var(--color-paper)',
+  zIndex: 4,
+} as const
+
+const headcountLabelCell = {
+  gridColumn: 1,
+  position: 'sticky',
+  left: 0,
+  background: 'var(--color-paper)',
+  paddingRight: 8,
+  fontSize: 11,
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: 0.3,
+  opacity: 0.7,
+  textAlign: 'right',
   zIndex: 4,
 } as const
 

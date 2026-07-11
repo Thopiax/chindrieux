@@ -60,6 +60,8 @@ export const dict = {
   'screen.backToToday': { en: 'Back to today', fr: "Retour à aujourd'hui", pt: 'Voltar para hoje', nl: 'Terug naar vandaag' },
 
   'whoshere.empty': { en: 'No dates on the calendar yet', fr: 'Pas encore de dates au calendrier', pt: 'Nenhuma data no calendário ainda', nl: 'Nog geen data op de kalender' },
+  'whoshere.headcount': { en: 'Here', fr: 'Présents', pt: 'Presentes', nl: 'Aanwezig' },
+  'whoshere.peopleOnDay': { en: '{n} here', fr: '{n} présents', pt: '{n} presentes', nl: '{n} aanwezig' },
   'whoshere.needDatesTitle': { en: 'Still need to pick dates', fr: 'Il manque encore des dates', pt: 'Ainda faltam datas', nl: 'Nog datums nodig' },
   'whoshere.setYourDates': { en: 'Set your dates', fr: 'Choisis tes dates', pt: 'Escolha suas datas', nl: 'Kies je datums' },
 
