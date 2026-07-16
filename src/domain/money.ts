@@ -54,6 +54,12 @@ function participantDays(e: Expense, end: string, people: Person[]): Map<string,
 // Fields are guarded (?? fallbacks) because a partially synced row can surface
 // with them briefly undefined; a NaN here would poison every balance.
 export function expenseShares(e: Expense, people: Person[]): Map<string, number> {
+  // Explicit per-person amounts (euros) trump every split rule.
+  if (e.custom_shares) {
+    return new Map(
+      Object.entries(e.custom_shares).map(([id, eur]) => [id, Math.round((eur ?? 0) * 100)]),
+    )
+  }
   const cents = Math.round((e.amount ?? 0) * 100)
   const end = e.end_date && e.end_date > e.date ? e.end_date : null
   if (e.per_head) {
@@ -78,6 +84,7 @@ export function expenseTotal(e: Expense, people: Person[]): number {
 // Net position per person in cents: what they paid minus what they owe, then
 // adjusted by settled payments. Always sums to zero. `people` feeds the
 // by-days split; without it every expense falls back to an even split.
+// Expenses with custom_shares (euros per person) use those instead.
 export function balances(expenses: Expense[], payments: Payment[], people: Person[] = []): Map<string, number> {
   const b = new Map<string, number>()
   const bump = (id: string, cents: number) => b.set(id, (b.get(id) ?? 0) + cents)

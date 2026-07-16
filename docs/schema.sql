@@ -34,6 +34,7 @@ create table expenses (
   -- amount is a per-person-per-day rate instead of a fixed total
   per_head boolean not null default false,
   participant_ids uuid[] not null,
+  custom_shares jsonb,
   photo_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

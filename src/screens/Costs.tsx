@@ -3,12 +3,12 @@ import { use$ } from '@legendapp/state/react'
 import { Badge } from '../components/Badge.tsx'
 import { Card } from '../components/Card.tsx'
 import { Screen } from '../components/Screen.tsx'
-import { PersonPicker } from '../components/PersonPicker.tsx'
 import { lang$, useT, type Lang } from '../i18n.ts'
 import { myId$ } from '../identity.ts'
 import { expenses$, payments$, people$, useRows } from '../store.ts'
 import { balances, expenseShares, expenseTotal, suggestTransfers } from '../domain/money.ts'
 import type { Expense, Payment, Person } from '../domain/types.ts'
+import { isPresentOn } from '../domain/presence.ts'
 import { uploadPhoto } from '../photos.ts'
 import { routeQuery } from '../nav.ts'
 import { todayISO } from '../today.ts'
@@ -242,7 +242,6 @@ export function Costs() {
   )
 }
 
-// Minimal stand-in badge for an id whose person row is gone (e.g. deleted).
 function fallbackPerson(name: string): Person {
   return { id: '', name, avatar_emoji: null, avatar_color: null, iban: null,
     arrival: null, departure: null, blaze: null, drink: null, has_car: null,
@@ -422,6 +421,49 @@ function CopyIban({ t, iban }: { t: T; iban: string }) {
   )
 }
 
+function groupByPresence(people: Person[], date: string) {
+  const here: Person[] = []
+  const gone: Person[] = []
+  const noDates: Person[] = []
+  for (const p of people) {
+    if (p.arrival === null || p.departure === null) noDates.push(p)
+    else if (isPresentOn(p, date)) here.push(p)
+    else gone.push(p)
+  }
+  return { here, gone, noDates }
+}
+
+function CollapsibleSection({
+  title, people, defaultOpen, children,
+}: {
+  title: string
+  people: Person[]
+  defaultOpen: boolean
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  if (people.length === 0) return null
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+          background: 'none', border: 'none', padding: '6px 0', minHeight: 36,
+          color: 'var(--color-ink)', display: 'flex', alignItems: 'center', gap: 6,
+        }}
+      >
+        <span style={{ display: 'inline-block', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }}>
+          ▶
+        </span>
+        {title} ({people.length})
+      </button>
+      {open && children}
+    </div>
+  )
+}
+
 function ExpenseForm({
   t, people, myId, initial, onClose,
 }: {
@@ -443,11 +485,20 @@ function ExpenseForm({
   const [photoUrl, setPhotoUrl] = useState<string | null>(initial?.photo_url ?? null)
   const [uploading, setUploading] = useState(false)
   const [uploadFailed, setUploadFailed] = useState(false)
+  const [customMode, setCustomMode] = useState(() => initial?.custom_shares != null)
+  const [customAmounts, setCustomAmounts] = useState<Record<string, string>>(() => {
+    if (initial?.custom_shares) {
+      const out: Record<string, string> = {}
+      for (const [id, v] of Object.entries(initial.custom_shares)) out[id] = String(v)
+      return out
+    }
+    return {}
+  })
 
   const ranged = endDate > date
   const checked = checkedFor(people, overrides)
   const amountNum = parseAmount(amount)
-  const canSave = label.trim() !== '' && amountNum > 0 && checked.size > 0
+  const totalCents = amountNum > 0 ? Math.round(amountNum * 100) : 0
 
   // Per-person share of the current split, so each ticked person's slice shows
   // next to their name. Built from a draft expense so it honours per-head and
@@ -458,16 +509,45 @@ function ExpenseForm({
     end_date: ranged ? endDate : null, per_head: perHead,
   }
   const split = amountNum > 0 && checked.size > 0 ? expenseShares(draft, people) : null
+
+  const customTotal = customMode
+    ? [...checked].reduce((sum, id) => sum + Math.round(parseAmount(customAmounts[id] ?? '0') * 100), 0)
+    : totalCents
+  const diff = totalCents - customTotal
+  const customValid = !customMode || diff === 0
+
+  const canSave = label.trim() !== '' && amountNum > 0 && checked.size > 0 && customValid
+
+
   const shareOf = (id: string) => {
+    if (!checked.has(id)) return null
+    if (customMode) {
+      const v = parseAmount(customAmounts[id] ?? '0')
+      return Number.isFinite(v) && v > 0 ? fmtEur(v) : null
+    }
     const c = split?.get(id)
     return c === undefined ? null : fmtCents(c)
   }
 
-  const toggle = (id: string) =>
-    setOverrides((o) => ({ ...o, [id]: !checked.has(id) }))
+  const toggle = (id: string) => {
+    const nowChecked = !checked.has(id)
+    setOverrides((o) => ({ ...o, [id]: nowChecked }))
+    if (!nowChecked && customMode) {
+      setCustomAmounts((a) => { const next = { ...a }; delete next[id]; return next })
+    }
+  }
+
+  const setCustomAmount = (id: string, raw: string) => {
+    setCustomAmounts((a) => ({ ...a, [id]: raw.replace(/[^0-9.,]/g, '') }))
+  }
 
   const save = () => {
     const id = initial?.id ?? crypto.randomUUID()
+    let cs: Record<string, number> | null = null
+    if (customMode) {
+      cs = {}
+      for (const pid of checked) cs[pid] = parseAmount(customAmounts[pid] ?? '0')
+    }
     const row: Expense = {
       id,
       payer_id: payerId,
@@ -478,6 +558,7 @@ function ExpenseForm({
       photo_url: photoUrl,
       end_date: ranged ? endDate : null,
       per_head: perHead,
+      custom_shares: cs,
     }
     expenses$[id].set(row)
     onClose()
@@ -491,6 +572,63 @@ function ExpenseForm({
     setOverrides(Object.fromEntries(people.map((p) => [p.id, p.drink === true])))
   const meatEaters = () =>
     setOverrides(Object.fromEntries(people.map((p) => [p.id, p.eats_meat !== false])))
+
+  const toggleCustomMode = () => {
+    if (!customMode && split) {
+      const seeded: Record<string, string> = {}
+      for (const [id, cents] of split) seeded[id] = (cents / 100).toFixed(2)
+      setCustomAmounts(seeded)
+    }
+    setCustomMode((m) => !m)
+  }
+
+  const { here, gone, noDates } = groupByPresence(people, date)
+
+  const renderRow = (p: Person) => {
+    const note = shareOf(p.id)
+    return (
+      <label
+        key={p.id}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 700, cursor: 'pointer' }}
+      >
+        <input
+          type="checkbox"
+          checked={checked.has(p.id)}
+          onChange={() => toggle(p.id)}
+          style={{ width: 20, height: 20 }}
+        />
+        <Badge person={p} size="sm" />
+        <span style={{ flex: 1 }}>{p.name}</span>
+        {customMode && checked.has(p.id) ? (
+          <input
+            type="text"
+            inputMode="decimal"
+            value={customAmounts[p.id] ?? ''}
+            placeholder="0.00"
+            onChange={(e) => setCustomAmount(p.id, e.target.value)}
+            style={{
+              ...mono, width: 80, fontSize: 14, padding: '4px 8px', borderRadius: 6,
+              border: '2px solid var(--color-ink)', textAlign: 'right',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          note !== null && (
+            <span style={{ marginLeft: 'auto', ...mono, fontSize: 14, opacity: 0.75 }}>
+              {note}
+            </span>
+          )
+        )}
+      </label>
+    )
+  }
+
+  const renderGroup = (group: Person[]) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {group.map(renderRow)}
+    </div>
+  )
 
   return (
     <div>
@@ -572,8 +710,51 @@ function ExpenseForm({
                 {chip.label}
               </button>
             ))}
+            {checked.size > 0 && amountNum > 0 && (
+              <button
+                type="button"
+                onClick={toggleCustomMode}
+                style={{
+                  fontFamily: 'inherit', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                  padding: '6px 12px', minHeight: 44, borderRadius: 9999, border: '2px solid var(--color-ink)',
+                  background: customMode ? 'var(--color-cerulean)' : 'transparent',
+                  color: customMode ? '#fff' : 'var(--color-ink)',
+                }}
+              >
+                {customMode ? t('costs.equalSplit') : t('costs.customAmounts')}
+              </button>
+            )}
           </div>
-          <PersonPicker people={people} selectedIds={checked} onToggle={toggle} noteOf={shareOf} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {here.length > 0 && (
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.6, marginBottom: 6 }}>
+                  {t('costs.hereOnDate')}
+                </div>
+                {renderGroup(here)}
+              </div>
+            )}
+
+            <CollapsibleSection title={t('costs.goneOnDate')} people={gone} defaultOpen={gone.some((p) => checked.has(p.id))}>
+              {renderGroup(gone)}
+            </CollapsibleSection>
+
+            <CollapsibleSection title={t('costs.noDates')} people={noDates} defaultOpen={noDates.some((p) => checked.has(p.id))}>
+              {renderGroup(noDates)}
+            </CollapsibleSection>
+          </div>
+
+          {customMode && amountNum > 0 && diff !== 0 && (
+            <p style={{
+              ...mono, fontSize: 13, marginTop: 8, fontWeight: 700,
+              color: 'var(--color-tomato-text)',
+            }}>
+              {diff > 0
+                ? t('costs.remaining', { amount: fmtCents(diff) })
+                : t('costs.over', { amount: fmtCents(-diff) })}
+            </p>
+          )}
         </div>
 
         <div>

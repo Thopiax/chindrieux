@@ -26,6 +26,8 @@ export type Expense = SyncFields & {
   // each participant owes amount × their days in the covered range (min 1)
   // and the payer collects the sum instead of a fixed total.
   per_head?: boolean | null
+  // Explicit euros per person; overrides every split rule when set.
+  custom_shares?: Record<string, number> | null
 }
 export type Payment = SyncFields & { id: string; from_id: string; to_id: string; amount: number }
 export type Tournament = SyncFields & { id: string; name: string; game: Game }

@@ -133,6 +133,13 @@ export const dict = {
   'costs.perHeadNote': { en: '{rate} per person per day', fr: '{rate} par personne et par jour', pt: '{rate} por pessoa por dia', nl: '{rate} per persoon per dag' },
   'costs.copyIban': { en: 'Copy IBAN', fr: "Copier l'IBAN", pt: 'Copiar IBAN', nl: 'IBAN kopiëren' },
   'costs.copied': { en: 'Copied ✓', fr: 'Copié ✓', pt: 'Copiado ✓', nl: 'Gekopieerd ✓' },
+  'costs.customAmounts': { en: 'Custom amounts', fr: 'Montants perso', pt: 'Valores personalizados', nl: 'Eigen bedragen' },
+  'costs.equalSplit': { en: 'Split equally', fr: 'Partager également', pt: 'Dividir igualmente', nl: 'Gelijk verdelen' },
+  'costs.remaining': { en: '{amount} remaining', fr: '{amount} restant', pt: '{amount} restante', nl: '{amount} resterend' },
+  'costs.over': { en: '{amount} over', fr: '{amount} en trop', pt: '{amount} a mais', nl: '{amount} te veel' },
+  'costs.hereOnDate': { en: 'Here', fr: 'Sur place', pt: 'Aqui', nl: 'Hier' },
+  'costs.goneOnDate': { en: 'Gone', fr: 'Absents', pt: 'Ausentes', nl: 'Afwezig' },
+  'costs.noDates': { en: 'No dates', fr: 'Pas de dates', pt: 'Sem datas', nl: 'Geen datums' },
 
   'tournaments.empty': { en: 'No tournaments yet. Start one!', fr: 'Pas encore de tournoi. Lance le premier !', pt: 'Nenhum torneio ainda. Comece um!', nl: 'Nog geen toernooien. Begin er een!' },
   'tournaments.newTournament': { en: '+ New tournament', fr: '+ Nouveau tournoi', pt: '+ Novo torneio', nl: '+ Nieuw toernooi' },
