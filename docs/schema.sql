@@ -30,6 +30,7 @@ create table expenses (
   label text not null,
   date date not null,
   participant_ids uuid[] not null,
+  custom_shares jsonb,
   photo_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

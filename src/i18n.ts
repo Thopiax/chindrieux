@@ -123,6 +123,13 @@ export const dict = {
   'costs.settled': { en: '{from} paid {to} {amount}', fr: '{from} a payé {amount} à {to}', pt: '{from} pagou {amount} pra {to}', nl: '{from} betaalde {amount} aan {to}' },
   'costs.undoPayment': { en: 'Undo this payment', fr: 'Annuler ce paiement', pt: 'Desfazer este pagamento', nl: 'Deze betaling ongedaan maken' },
   'costs.tapToUndo': { en: 'Tap again to undo', fr: 'Appuie encore pour annuler', pt: 'Toque de novo pra desfazer', nl: 'Tik nog eens om ongedaan te maken' },
+  'costs.customAmounts': { en: 'Custom amounts', fr: 'Montants perso', pt: 'Valores personalizados', nl: 'Eigen bedragen' },
+  'costs.equalSplit': { en: 'Split equally', fr: 'Partager également', pt: 'Dividir igualmente', nl: 'Gelijk verdelen' },
+  'costs.remaining': { en: '{amount} remaining', fr: '{amount} restant', pt: '{amount} restante', nl: '{amount} resterend' },
+  'costs.over': { en: '{amount} over', fr: '{amount} en trop', pt: '{amount} a mais', nl: '{amount} te veel' },
+  'costs.hereOnDate': { en: 'Here', fr: 'Sur place', pt: 'Aqui', nl: 'Hier' },
+  'costs.goneOnDate': { en: 'Gone', fr: 'Absents', pt: 'Ausentes', nl: 'Afwezig' },
+  'costs.noDates': { en: 'No dates', fr: 'Pas de dates', pt: 'Sem datas', nl: 'Geen datums' },
 
   'tournaments.empty': { en: 'No tournaments yet. Start one!', fr: 'Pas encore de tournoi. Lance le premier !', pt: 'Nenhum torneio ainda. Comece um!', nl: 'Nog geen toernooien. Begin er een!' },
   'tournaments.newTournament': { en: '+ New tournament', fr: '+ Nouveau tournoi', pt: '+ Novo torneio', nl: '+ Nieuw toernooi' },

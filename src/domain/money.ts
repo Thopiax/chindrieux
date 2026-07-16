@@ -19,13 +19,21 @@ export function shares(totalCents: number, participantIds: string[]): Map<string
 
 // Net position per person in cents: what they paid minus what they owe, then
 // adjusted by settled payments. Always sums to zero.
+// When an expense has custom_shares (euros per person), those are used instead
+// of an equal split.
 export function balances(expenses: Expense[], payments: Payment[]): Map<string, number> {
   const b = new Map<string, number>()
   const bump = (id: string, cents: number) => b.set(id, (b.get(id) ?? 0) + cents)
   for (const e of expenses) {
     const totalCents = Math.round(e.amount * 100)
     bump(e.payer_id, totalCents)
-    for (const [id, owed] of shares(totalCents, e.participant_ids)) bump(id, -owed)
+    if (e.custom_shares) {
+      for (const [id, euros] of Object.entries(e.custom_shares)) {
+        bump(id, -Math.round(euros * 100))
+      }
+    } else {
+      for (const [id, owed] of shares(totalCents, e.participant_ids)) bump(id, -owed)
+    }
   }
   for (const p of payments) {
     const cents = Math.round(p.amount * 100)

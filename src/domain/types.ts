@@ -14,6 +14,7 @@ export type Person = SyncFields & {
 export type Expense = SyncFields & {
   id: string; payer_id: string; amount: number; label: string; date: string
   participant_ids: string[]; photo_url: string | null
+  custom_shares: Record<string, number> | null
 }
 export type Payment = SyncFields & { id: string; from_id: string; to_id: string; amount: number }
 export type Tournament = SyncFields & { id: string; name: string; game: Game }

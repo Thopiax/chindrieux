@@ -4,10 +4,11 @@ import { balances, shares, suggestTransfers } from './money.ts'
 
 function expense(
   id: string, payer_id: string, amount: number, participant_ids: string[],
+  custom_shares: Record<string, number> | null = null,
 ): Expense {
   return {
     id, payer_id, amount, label: id, date: '2026-07-10',
-    participant_ids, photo_url: null,
+    participant_ids, photo_url: null, custom_shares,
   }
 }
 function payment(id: string, from_id: string, to_id: string, amount: number): Payment {
@@ -76,6 +77,25 @@ describe('balances', () => {
     expect(b.get('alice')).toBe(2000)
     expect(b.get('bob')).toBe(-1000)
     expect(b.get('marie')).toBe(-1000)
+  })
+  test('custom_shares override equal split', () => {
+    const exp = [expense('e', 'alice', 30, ['alice', 'bob', 'marie'], {
+      alice: 10, bob: 15, marie: 5,
+    })]
+    const b = balances(exp, [])
+    // alice: paid 3000, owes 1000 -> +2000
+    expect(b.get('alice')).toBe(2000)
+    // bob: paid 0, owes 1500 -> -1500
+    expect(b.get('bob')).toBe(-1500)
+    // marie: paid 0, owes 500 -> -500
+    expect(b.get('marie')).toBe(-500)
+  })
+  test('custom_shares balances sum to zero', () => {
+    const exp = [expense('e', 'bob', 50, ['alice', 'bob'], {
+      alice: 20, bob: 30,
+    })]
+    const b = balances(exp, [])
+    expect([...b.values()].reduce((x, y) => x + y, 0)).toBe(0)
   })
 })
 
